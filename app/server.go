@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// Listen for incoming connections
-	listener, err := net.Listen("tcp", "0.0.0.0::6379")
+	listener, err := net.Listen("tcp", "0.0.0.0:6379")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -17,7 +17,7 @@ func main() {
 	// Ensure we teardown the server when the program exits
 	defer listener.Close()
 
-	fmt.Println("Server is listening on port 8080")
+	fmt.Println("Server is listening on port 6379")
 
 	for {
 		// Block until we receive an incoming connection
