@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// Listen for incoming connections
-	listener, err := net.Listen("tcp", "localhost:8080")
+	listener, err := net.Listen("tcp", "0.0.0.0::6379")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
