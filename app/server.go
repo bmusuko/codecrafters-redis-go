@@ -31,10 +31,11 @@ func main() {
 		}
 	}(c)
 
-	_, err = c.Write([]byte("+PONG\r\n"))
-	if err != nil {
-		fmt.Println("err replying: ", err.Error())
-		os.Exit(1)
+	for i := 0; i < 2; i++ {
+		_, err = c.Write([]byte("+PONG\r\n"))
+		if err != nil {
+			fmt.Println("err replying: ", err.Error())
+			os.Exit(1)
+		}
 	}
-
 }
