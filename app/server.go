@@ -37,6 +37,7 @@ func handleClient(conn net.Conn) {
 	buf := make([]byte, 1024)
 	n, err := conn.Read(buf)
 	if err != nil {
+		fmt.Printf("failed to read data")
 		return
 	}
 
