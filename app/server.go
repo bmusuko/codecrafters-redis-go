@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	// Uncomment this block to pass the first stage
 	"net"
@@ -19,18 +20,26 @@ func main() {
 		os.Exit(1)
 	}
 
+	c, err := l.Accept()
+
+	if err != nil {
+		fmt.Println("Error accepting connection: ", err.Error())
+		os.Exit(1)
+	}
+	defer func() {
+		c.Close()
+	}()
+
+	reader := bufio.NewReader(c)
 	for {
-		c, err := l.Accept()
-
+		input, err := reader.ReadString('\n')
 		if err != nil {
-			fmt.Println("Error accepting connection: ", err.Error())
-			os.Exit(1)
+			fmt.Println("Error reading:", err.Error())
+			return
 		}
 
-		if err != nil {
-			fmt.Println("Error accepting connection:", err.Error())
-			continue
-		}
+		// Process the input (here you might parse and handle the Redis protocol)
+		fmt.Println("Received:", input)
 
 		_, err = c.Write([]byte("+PONG\r\n"))
 		if err != nil {
@@ -38,4 +47,5 @@ func main() {
 			os.Exit(1)
 		}
 	}
+
 }
