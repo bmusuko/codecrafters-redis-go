@@ -42,6 +42,8 @@ func handleClient(conn net.Conn) {
 			return
 		}
 
+		fmt.Printf("got %s", string(buf[:n]))
+
 		trimmed := strings.TrimSuffix(string(buf[:n]), "\n")
 		strs := strings.Split(trimmed, " ")
 		command := strings.ToLower(strs[0])
