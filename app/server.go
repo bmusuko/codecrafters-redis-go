@@ -33,16 +33,19 @@ func main() {
 }
 
 func handleClient(conn net.Conn) {
-	// Read data
-	buf := make([]byte, 1024)
-	n, err := conn.Read(buf)
-	if err != nil {
-		fmt.Printf("failed to read data")
-		return
+	for {
+		// Read data
+		buf := make([]byte, 1024)
+		n, err := conn.Read(buf)
+		if err != nil {
+			fmt.Printf("failed to read data")
+			return
+		}
+
+		log.Println("Received data", buf[:n])
+
+		// Write the same data back
+		conn.Write([]byte("+PONG\r\n"))
 	}
 
-	log.Println("Received data", buf[:n])
-
-	// Write the same data back
-	conn.Write([]byte("+PONG\r\n"))
 }
