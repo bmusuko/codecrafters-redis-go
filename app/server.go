@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net"
+	"strings"
 )
 
 func main() {
@@ -42,10 +42,21 @@ func handleClient(conn net.Conn) {
 			return
 		}
 
-		log.Println("Received data", buf[:n])
+		trimmed := strings.TrimSuffix(string(buf[:n]), "\n")
+		strs := strings.Split(trimmed, " ")
+		command := strings.ToLower(strs[0])
 
-		// Write the same data back
-		conn.Write([]byte("+PONG\r\n"))
+		var reply string
+		switch command {
+		case "ping":
+			reply = "PONG"
+			break
+		case "echo":
+			reply = strs[1]
+			break
+		}
+
+		conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 	}
 
 }
