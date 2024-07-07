@@ -1,51 +1,50 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	// Uncomment this block to pass the first stage
+	"log"
 	"net"
-	"os"
 )
 
 func main() {
-	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	fmt.Println("Logs from your program will appear here!")
-
-	// Uncomment this block to pass the first stage
-	//
-	l, err := net.Listen("tcp", "0.0.0.0:6379")
+	// Listen for incoming connections
+	listener, err := net.Listen("tcp", "localhost:8080")
 	if err != nil {
-		fmt.Println("Failed to bind to port 6379")
-		os.Exit(1)
+		fmt.Println("Error:", err)
+		return
 	}
 
-	c, err := l.Accept()
+	// Ensure we teardown the server when the program exits
+	defer listener.Close()
 
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
-	}
-	defer func() {
-		c.Close()
-	}()
+	fmt.Println("Server is listening on port 8080")
 
-	reader := bufio.NewReader(c)
 	for {
-		input, err := reader.ReadString('\n')
+		// Block until we receive an incoming connection
+		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("Error reading:", err.Error())
-			return
+			fmt.Println("Error:", err)
+			continue
 		}
 
-		// Process the input (here you might parse and handle the Redis protocol)
-		fmt.Println("Received:", input)
+		// Handle client connection
+		handleClient(conn)
+	}
+}
 
-		_, err = c.Write([]byte("+PONG\r\n"))
-		if err != nil {
-			fmt.Println("err replying: ", err.Error())
-			os.Exit(1)
-		}
+func handleClient(conn net.Conn) {
+	// Ensure we close the connection after we're done
+	defer conn.Close()
+
+	// Read data
+	buf := make([]byte, 1024)
+	n, err := conn.Read(buf)
+	if err != nil {
+		return
 	}
 
+	log.Println("Received data", buf[:n])
+
+	// Write the same data back
+	conn.Write([]byte("+PONG\r\n"))
 }
