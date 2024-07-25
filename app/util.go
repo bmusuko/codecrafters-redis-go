@@ -64,7 +64,7 @@ func parseString(input string) ([]string, error) {
 		elements = append(elements, element)
 
 		// Move past the current element in the input string
-		input = input[endIndex:]
+		input = input[endIndex+2:]
 		fmt.Printf("inspect %s", input)
 	}
 
