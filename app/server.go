@@ -42,10 +42,14 @@ func handleClient(conn net.Conn) {
 			return
 		}
 
-		fmt.Printf("got %s", string(buf[:n]))
+		rawStr := string(buf[:n])
 
-		trimmed := strings.TrimSuffix(string(buf[:n]), "\n")
-		strs := strings.Split(trimmed, " ")
+		fmt.Printf("got %s", rawStr)
+		strs, err := parseString(rawStr)
+		if err != nil {
+			fmt.Printf("failed to read data %+v", err)
+			return
+		}
 		command := strings.ToLower(strs[0])
 
 		var reply string
