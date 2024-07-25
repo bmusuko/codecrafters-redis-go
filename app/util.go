@@ -32,14 +32,12 @@ func parseString(input string) ([]string, error) {
 	input = input[index+2:] // Move past "\r\n"
 
 	for i := 0; i < numElements; i++ {
-		fmt.Printf("inspect %s", input)
 		// Find the length of the element string
 		if !strings.HasPrefix(input, "$") {
 			return nil, fmt.Errorf("invalid input format: missing '$'")
 		}
 
 		input = input[1:] // Trim the initial '$'
-		fmt.Printf("inspect %s", input)
 
 		// Find the length of the current element
 		index = strings.Index(input, "\r\n")
@@ -65,7 +63,6 @@ func parseString(input string) ([]string, error) {
 
 		// Move past the current element in the input string
 		input = input[endIndex+2:]
-		fmt.Printf("inspect %s", input)
 	}
 
 	return elements, nil
