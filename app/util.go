@@ -9,7 +9,7 @@ import (
 func parseString(input string) ([]string, error) {
 	// Check if input starts with '*'
 	if !strings.HasPrefix(input, "*") {
-		return nil, fmt.Errorf("invalid input format")
+		return nil, fmt.Errorf("input does not start with '*'")
 	}
 
 	// Trim the initial '*'
@@ -18,13 +18,13 @@ func parseString(input string) ([]string, error) {
 	// Find the number of elements
 	index := strings.Index(input, "\r\n")
 	if index == -1 {
-		return nil, fmt.Errorf("invalid input format")
+		return nil, fmt.Errorf("invalid input format: missing '\\r\\n'")
 	}
 
 	numElementsStr := input[:index]
 	numElements, err := strconv.Atoi(numElementsStr)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse number of elements")
+		return nil, fmt.Errorf("failed to parse number of elements: %v", err)
 	}
 
 	// Prepare to parse each element
@@ -34,7 +34,7 @@ func parseString(input string) ([]string, error) {
 	for i := 0; i < numElements; i++ {
 		// Find the length of the element string
 		if !strings.HasPrefix(input, "$") {
-			return nil, fmt.Errorf("invalid input format")
+			return nil, fmt.Errorf("invalid input format: missing '$'")
 		}
 
 		input = input[1:] // Trim the initial '$'
@@ -42,13 +42,13 @@ func parseString(input string) ([]string, error) {
 		// Find the length of the current element
 		index = strings.Index(input, "\r\n")
 		if index == -1 {
-			return nil, fmt.Errorf("invalid input format")
+			return nil, fmt.Errorf("invalid input format: missing '\\r\\n'")
 		}
 
 		lengthStr := input[:index]
 		length, err := strconv.Atoi(lengthStr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse element length")
+			return nil, fmt.Errorf("failed to parse element length: %v", err)
 		}
 
 		// Extract the element itself
