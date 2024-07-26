@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -25,9 +24,9 @@ func handleSet(now time.Time, strs []string) {
 	}
 
 	if len(strs) > 2 {
-		switch strings.ToLower(strs[3]) {
+		switch strings.ToLower(strs[2]) {
 		case "px":
-			ms, err := strconv.Atoi(strs[4])
+			ms, err := strconv.Atoi(strs[2])
 			if err != nil {
 				os.Exit(-1)
 			}
@@ -47,8 +46,6 @@ func handleGet(now time.Time, key string) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	fmt.Println("Now: ", now)
-	fmt.Println("ExpireAt: ", stored.expireAt)
 	if expireAt := stored.expireAt; !expireAt.IsZero() && expireAt.Before(now) {
 		return "", false
 	}
