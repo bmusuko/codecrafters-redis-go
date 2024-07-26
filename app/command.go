@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -46,6 +47,8 @@ func handleGet(now time.Time, key string) (string, bool) {
 	if !ok {
 		return "", false
 	}
+	fmt.Println("Now: ", now)
+	fmt.Println("ExpireAt: ", stored.expireAt)
 	if expireAt := stored.expireAt; !expireAt.IsZero() && expireAt.Before(now) {
 		return "", false
 	}
