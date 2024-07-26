@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -41,6 +42,7 @@ func handleClient(conn net.Conn) {
 			fmt.Printf("failed to read data")
 			return
 		}
+		now := time.Now()
 
 		rawStr := string(buf[:n])
 
@@ -62,10 +64,10 @@ func handleClient(conn net.Conn) {
 			reply = strs[1]
 			break
 		case "set":
-			handleSet(strs[1:])
+			handleSet(now, strs[1:])
 			reply = "OK"
 		case "get":
-			resp, ok := handleGet(strs[1])
+			resp, ok := handleGet(now, strs[1])
 			if ok {
 				reply = resp
 			} else {

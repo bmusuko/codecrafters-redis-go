@@ -15,7 +15,7 @@ type store struct {
 
 var _map sync.Map
 
-func handleSet(strs []string) {
+func handleSet(now time.Time, strs []string) {
 	key := strs[0]
 	value := strs[1]
 
@@ -30,14 +30,14 @@ func handleSet(strs []string) {
 			if err != nil {
 				os.Exit(-1)
 			}
-			stored.expireAt = time.Now().Add(time.Millisecond * time.Duration(ms))
+			stored.expireAt = now.Add(time.Millisecond * time.Duration(ms))
 		}
 	}
 
 	_map.Store(key, stored)
 }
 
-func handleGet(key string) (string, bool) {
+func handleGet(now time.Time, key string) (string, bool) {
 	value, ok := _map.Load(key)
 	if !ok {
 		return "", false
@@ -46,7 +46,7 @@ func handleGet(key string) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	if expireAt := stored.expireAt; !expireAt.IsZero() && expireAt.Before(time.Now()) {
+	if expireAt := stored.expireAt; !expireAt.IsZero() && expireAt.Before(now) {
 		return "", false
 	}
 
