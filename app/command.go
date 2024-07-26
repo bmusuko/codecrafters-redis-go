@@ -26,7 +26,7 @@ func handleSet(now time.Time, strs []string) {
 	if len(strs) > 2 {
 		switch strings.ToLower(strs[2]) {
 		case "px":
-			ms, err := strconv.Atoi(strs[2])
+			ms, err := strconv.Atoi(strs[3])
 			if err != nil {
 				os.Exit(-1)
 			}
