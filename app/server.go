@@ -59,20 +59,26 @@ func handleClient(conn net.Conn) {
 		switch command {
 		case "ping":
 			reply = "PONG"
+			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 			break
 		case "echo":
 			reply = strs[1]
+			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 			break
 		case "set":
 			handleSet(now, strs[1:])
 			reply = "OK"
+			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 		case "get":
 			resp, ok := handleGet(now, strs[1])
 			if ok {
 				reply = resp
+				conn.Write([]byte(fmt.Sprintf("$%d\r\n%s\r\n", len(reply), reply)))
 			} else {
 				reply = "-1"
+				conn.Write([]byte(fmt.Sprintf("$%s\r\n", reply)))
 			}
+			break
 		}
 
 		conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
