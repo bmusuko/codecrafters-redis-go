@@ -44,12 +44,13 @@ func handleClient(conn net.Conn) {
 
 		rawStr := string(buf[:n])
 
-		fmt.Printf("got %s", rawStr)
 		strs, err := parseString(rawStr)
 		if err != nil {
 			fmt.Printf("failed to read data %+v", err)
 			return
 		}
+		fmt.Printf("got %q", strs)
+
 		command := strings.ToLower(strs[0])
 
 		var reply string
