@@ -69,6 +69,7 @@ func handleClient(conn net.Conn) {
 			handleSet(now, strs[1:])
 			reply = "OK"
 			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+			break
 		case "get":
 			resp, ok := handleGet(now, strs[1])
 			if ok {
@@ -80,8 +81,6 @@ func handleClient(conn net.Conn) {
 			}
 			break
 		}
-
-		conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 	}
 
 }
