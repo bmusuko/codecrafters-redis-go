@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 	"strings"
-	"sync"
 )
 
 func main() {
@@ -31,24 +30,6 @@ func main() {
 		// Handle client connection
 		go handleClient(conn)
 	}
-}
-
-var _map sync.Map
-
-func handleSet(key, value string) {
-	_map.Store(key, value)
-}
-
-func handleGet(key string) (string, bool) {
-	value, ok := _map.Load(key)
-	if !ok {
-		return "", false
-	}
-	str, ok := value.(string)
-	if !ok {
-		return "", false
-	}
-	return str, true
 }
 
 func handleClient(conn net.Conn) {
@@ -80,7 +61,7 @@ func handleClient(conn net.Conn) {
 			reply = strs[1]
 			break
 		case "set":
-			handleSet(strs[1], strs[2])
+			handleSet(strs[1:])
 			reply = "OK"
 		case "get":
 			resp, ok := handleGet(strs[1])
