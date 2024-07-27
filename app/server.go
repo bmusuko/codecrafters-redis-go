@@ -7,7 +7,6 @@ import (
 
 func main() {
 	initMeta()
-	fmt.Printf("meta_into=%+v")
 
 	port := _metaInfo.port
 	// Listen for incoming connections

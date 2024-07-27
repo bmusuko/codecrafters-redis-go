@@ -16,7 +16,7 @@ type metaInfo struct {
 }
 
 func (mi metaInfo) isMaster() bool {
-	return mi.port == 6379
+	return len(mi.masterHost) != 0
 }
 
 var (
