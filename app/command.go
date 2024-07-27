@@ -52,3 +52,11 @@ func handleGet(now time.Time, key string) (string, bool) {
 
 	return stored.value, true
 }
+
+func handleInfo() string {
+	if port == 6379 {
+		return "role:master"
+	} else {
+		return "role:slave"
+	}
+}

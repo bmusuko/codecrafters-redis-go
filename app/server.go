@@ -8,9 +8,11 @@ import (
 	"time"
 )
 
-func main() {
-	var port int
+var (
+	port int
+)
 
+func main() {
 	// Define the port flag
 	flag.IntVar(&port, "port", 6379, "Port number to listen on")
 	flag.Parse()
@@ -86,6 +88,10 @@ func handleClient(conn net.Conn) {
 				reply = "-1"
 				conn.Write([]byte(fmt.Sprintf("$%s\r\n", reply)))
 			}
+			break
+		case "info":
+			reply = handleInfo()
+			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 			break
 		}
 	}
