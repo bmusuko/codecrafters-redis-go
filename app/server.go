@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net"
 	"strings"
@@ -8,8 +9,13 @@ import (
 )
 
 func main() {
+	var port int
+
+	// Define the port flag
+	flag.IntVar(&port, "port", 6379, "Port number to listen on")
+
 	// Listen for incoming connections
-	listener, err := net.Listen("tcp", "0.0.0.0:6379")
+	listener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", port))
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
