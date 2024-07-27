@@ -7,6 +7,6 @@ import (
 )
 
 func sendBulkString(conn net.Conn, strs []string) {
-	str := strings.Join(strs, "\r\n")
+	str := strings.Join(strs, "\n")
 	conn.Write([]byte(fmt.Sprintf("+%s\r\n", str)))
 }
