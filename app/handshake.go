@@ -26,7 +26,6 @@ func handshake() {
 		fmt.Printf("failed to send ping")
 		os.Exit(-1)
 	}
-
 	time.Sleep(time.Millisecond * 100)
 
 	// send REPLCONF
@@ -35,7 +34,6 @@ func handshake() {
 		fmt.Printf("failed to send first REPLCONF")
 		os.Exit(-1)
 	}
-
 	time.Sleep(time.Millisecond * 100)
 
 	_, err = conn.Write([]byte("*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n"))
@@ -45,4 +43,11 @@ func handshake() {
 	}
 	time.Sleep(time.Millisecond * 100)
 
+	// *3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n
+	_, err = conn.Write([]byte("*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n"))
+	if err != nil {
+		fmt.Printf("failed to send second REPLCONF")
+		os.Exit(-1)
+	}
+	time.Sleep(time.Millisecond * 100)
 }
