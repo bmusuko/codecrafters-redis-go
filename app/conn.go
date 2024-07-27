@@ -63,7 +63,7 @@ func handleClient(conn net.Conn) {
 			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 			break
 		case "psync":
-			conn.Write([]byte(fmt.Sprintf("+FULLRESYNC %s 0\r\n", _metaInfo.masterReplID)))
+			conn.Write([]byte(fmt.Sprintf("+FULLRESYNC %s %d\r\n", _metaInfo.masterReplID, *_metaInfo.masterReplOffset)))
 		}
 	}
 }
