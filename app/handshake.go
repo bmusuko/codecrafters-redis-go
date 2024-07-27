@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"time"
 )
 
 func handshake() {
@@ -26,6 +27,8 @@ func handshake() {
 		os.Exit(-1)
 	}
 
+	time.Sleep(time.Millisecond * 100)
+
 	// send REPLCONF
 	_, err = conn.Write([]byte(fmt.Sprintf("*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$%d\r\n%d\r\n", len(strconv.Itoa(_metaInfo.masterPort)), _metaInfo.port)))
 	if err != nil {
@@ -33,9 +36,13 @@ func handshake() {
 		os.Exit(-1)
 	}
 
+	time.Sleep(time.Millisecond * 100)
+
 	_, err = conn.Write([]byte("*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n"))
 	if err != nil {
 		fmt.Printf("failed to send second REPLCONF")
 		os.Exit(-1)
 	}
+	time.Sleep(time.Millisecond * 100)
+
 }
