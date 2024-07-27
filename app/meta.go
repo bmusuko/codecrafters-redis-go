@@ -12,7 +12,7 @@ type metaInfo struct {
 	masterHost       string
 	masterPort       int
 	masterReplID     string
-	masterReplOffset int
+	masterReplOffset *int
 }
 
 var (
@@ -33,9 +33,9 @@ func initMeta() {
 			os.Exit(-1)
 		}
 		_metaInfo.masterPort = masterPort
-
+	} else {
 		_metaInfo.masterReplID = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
-		_metaInfo.masterReplOffset = 0
+		_metaInfo.masterReplOffset = ptr(0)
 	}
 
 	flag.Parse()

@@ -67,3 +67,7 @@ func parseString(input string) ([]string, error) {
 
 	return elements, nil
 }
+
+func ptr[T any](t T) *T {
+	return &t
+}

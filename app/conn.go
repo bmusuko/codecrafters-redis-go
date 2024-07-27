@@ -55,9 +55,8 @@ func handleClient(conn net.Conn) {
 			}
 			break
 		case "info":
-			reply = handleInfo()
-
-			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+			replies := handleInfo()
+			sendBulkString(conn, replies)
 			break
 		}
 	}

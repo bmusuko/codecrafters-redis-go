@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -53,10 +54,21 @@ func handleGet(now time.Time, key string) (string, bool) {
 	return stored.value, true
 }
 
-func handleInfo() string {
+func handleInfo() []string {
+	var reply []string
+
 	if _metaInfo.port == 6379 {
-		return "role:master"
+		reply = append(reply, "role:master")
 	} else {
-		return "role:slave"
+		reply = append(reply, "role:slave")
 	}
+
+	if len(_metaInfo.masterReplID) > 0 {
+		reply = append(reply, fmt.Sprintf("master_replid:%s", _metaInfo.masterReplID))
+	}
+	if _metaInfo.masterReplOffset != nil {
+		reply = append(reply, fmt.Sprintf("master_repl_offset:%d", *_metaInfo.masterReplOffset))
+	}
+
+	return reply
 }
