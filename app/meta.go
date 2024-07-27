@@ -29,6 +29,8 @@ func initMeta() {
 
 	replicaOf := ""
 	flag.StringVar(&replicaOf, "replicaof", "", "Replication info")
+	flag.Parse()
+
 	if len(replicaOf) > 0 {
 		replicaInfo := strings.Split(replicaOf, " ")
 		_metaInfo.masterHost = replicaInfo[0]
@@ -42,5 +44,4 @@ func initMeta() {
 		_metaInfo.masterReplOffset = ptr(0)
 	}
 
-	flag.Parse()
 }
