@@ -8,9 +8,11 @@ import (
 )
 
 type metaInfo struct {
-	port       int
-	masterHost string
-	masterPort int
+	port             int
+	masterHost       string
+	masterPort       int
+	masterReplID     string
+	masterReplOffset int
 }
 
 var (
@@ -31,6 +33,9 @@ func initMeta() {
 			os.Exit(-1)
 		}
 		_metaInfo.masterPort = masterPort
+
+		_metaInfo.masterReplID = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
+		_metaInfo.masterReplOffset = 0
 	}
 
 	flag.Parse()
