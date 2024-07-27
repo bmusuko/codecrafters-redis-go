@@ -54,7 +54,7 @@ func handleGet(now time.Time, key string) (string, bool) {
 }
 
 func handleInfo() string {
-	if port == 6379 {
+	if _metaInfo.port == 6379 {
 		return "role:master"
 	} else {
 		return "role:slave"
