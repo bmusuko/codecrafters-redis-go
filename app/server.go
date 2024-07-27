@@ -21,6 +21,10 @@ func main() {
 
 	fmt.Println(fmt.Sprintf("Server is listening on port %d", port))
 
+	if !_metaInfo.isMaster() {
+		handshake()
+	}
+
 	for {
 		// Block until we receive an incoming connection
 		conn, err := listener.Accept()

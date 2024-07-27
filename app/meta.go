@@ -15,6 +15,10 @@ type metaInfo struct {
 	masterReplOffset *int
 }
 
+func (mi metaInfo) isMaster() bool {
+	return mi.port == 6379
+}
+
 var (
 	_metaInfo metaInfo
 )
