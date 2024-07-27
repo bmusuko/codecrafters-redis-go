@@ -1,10 +1,15 @@
 package main
 
 import (
+	"encoding/hex"
 	"flag"
 	"os"
 	"strconv"
 	"strings"
+)
+
+const (
+	_emptyRDBHex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2"
 )
 
 type metaInfo struct {
@@ -44,4 +49,13 @@ func initMeta() {
 		_metaInfo.masterReplOffset = ptr(0)
 	}
 
+}
+
+func getEmptyRDBByte() []byte {
+	// Decode the hexadecimal string
+	byteSlice, err := hex.DecodeString(_emptyRDBHex)
+	if err != nil {
+		os.Exit(-1)
+	}
+	return byteSlice
 }

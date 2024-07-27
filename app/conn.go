@@ -64,6 +64,9 @@ func handleClient(conn net.Conn) {
 			break
 		case "psync":
 			conn.Write([]byte(fmt.Sprintf("+FULLRESYNC %s %d\r\n", _metaInfo.masterReplID, *_metaInfo.masterReplOffset)))
+			time.Sleep(100 * time.Millisecond)
+			fullByte := getEmptyRDBByte()
+			conn.Write([]byte(fmt.Sprintf("$%d\r\n%s", len(fullByte), fullByte)))
 		}
 	}
 }
