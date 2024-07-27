@@ -13,6 +13,7 @@ func main() {
 
 	// Define the port flag
 	flag.IntVar(&port, "port", 6379, "Port number to listen on")
+	flag.Parse()
 
 	// Listen for incoming connections
 	listener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", port))
@@ -24,7 +25,7 @@ func main() {
 	// Ensure we teardown the server when the program exits
 	defer listener.Close()
 
-	fmt.Println("Server is listening on port 6379")
+	fmt.Println(fmt.Sprintf("Server is listening on port %d", port))
 
 	for {
 		// Block until we receive an incoming connection
