@@ -58,6 +58,10 @@ func handleClient(conn net.Conn) {
 			replies := handleInfo()
 			sendBulkString(conn, replies)
 			break
+		case "replconf":
+			reply = "OK"
+			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+			break
 		}
 	}
 
