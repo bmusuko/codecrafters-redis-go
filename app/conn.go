@@ -66,18 +66,14 @@ func handleClient(conn net.Conn) {
 		case "replconf":
 			reply = "OK"
 			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
-			if strs[1] == "listening-port" {
-				slaveAddr := fmt.Sprintf("localhost:%s", strs[2])
-				_metaInfo.addSlave(slaveAddr)
-				fmt.Printf("add slave %s\n", slaveAddr)
-			}
-
 			break
 		case "psync":
 			conn.Write([]byte(fmt.Sprintf("+FULLRESYNC %s %d\r\n", _metaInfo.masterReplID, *_metaInfo.masterReplOffset)))
 			time.Sleep(100 * time.Millisecond)
 			fullByte := getEmptyRDBByte()
 			conn.Write([]byte(fmt.Sprintf("$%d\r\n%s", len(fullByte), fullByte)))
+
+			_metaInfo.addSlave(conn)
 		}
 	}
 }

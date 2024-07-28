@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/hex"
 	"flag"
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -18,15 +19,15 @@ type metaInfo struct {
 	masterPort       int
 	masterReplID     string
 	masterReplOffset *int
-	slaves           []string
+	slaves           []net.Conn
 }
 
 func (mi *metaInfo) isMaster() bool {
 	return len(mi.masterHost) == 0
 }
 
-func (mi *metaInfo) addSlave(addr string) {
-	mi.slaves = append(mi.slaves, addr)
+func (mi *metaInfo) addSlave(conn net.Conn) {
+	mi.slaves = append(mi.slaves, conn)
 }
 
 var (
