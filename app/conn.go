@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net"
-	"os"
 	"strings"
 	"time"
 )
@@ -71,36 +70,18 @@ func handleClient(conn net.Conn) {
 		case "replconf":
 			reply = "OK"
 			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+			if strs[1] == "listening-port" {
+				slaveAddr := fmt.Sprintf("0.0.0.0:%s", strs[2])
+				_metaInfo.addSlave(slaveAddr)
+				fmt.Printf("add slave %s", slaveAddr)
+			}
+
 			break
 		case "psync":
 			conn.Write([]byte(fmt.Sprintf("+FULLRESYNC %s %d\r\n", _metaInfo.masterReplID, *_metaInfo.masterReplOffset)))
 			time.Sleep(100 * time.Millisecond)
 			fullByte := getEmptyRDBByte()
 			conn.Write([]byte(fmt.Sprintf("$%d\r\n%s", len(fullByte), fullByte)))
-
-			slaveAddr := getClientAddress(conn)
-			_metaInfo.addSlave(slaveAddr)
-			fmt.Printf("add slave %s", slaveAddr)
 		}
 	}
-}
-
-// getClientAddress takes a net.Conn and returns the client's IP address and port as a formatted string.
-func getClientAddress(conn net.Conn) string {
-	// Get the remote address from the connection
-	remoteAddr := conn.RemoteAddr()
-
-	// Convert the remote address to a TCP address
-	tcpAddr, ok := remoteAddr.(*net.TCPAddr)
-	if !ok {
-		os.Exit(-1)
-	}
-
-	// Extract the IP address and port from the TCP address
-	clientIP := tcpAddr.IP.String()
-	clientPort := tcpAddr.Port
-
-	// Format the IP address and port into a string
-	address := fmt.Sprintf("%s:%d", clientIP, clientPort)
-	return address
 }
