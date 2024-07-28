@@ -15,10 +15,6 @@ func handshake() {
 		os.Exit(-1)
 	}
 
-	defer func() {
-		conn.Close()
-	}()
-
 	// send PING
 	_, err = conn.Write([]byte("*1\r\n$4\r\nPING\r\n"))
 	if err != nil {
