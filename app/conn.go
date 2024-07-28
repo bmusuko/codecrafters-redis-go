@@ -78,6 +78,7 @@ func handleClient(conn net.Conn) {
 			conn.Write([]byte(fmt.Sprintf("$%d\r\n%s", len(fullByte), fullByte)))
 
 			_metaInfo.addSlave(conn.LocalAddr().String())
+			fmt.Printf("add slave %s", conn.LocalAddr().String())
 		}
 	}
 }
