@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 )
 
 func handleClient(conn net.Conn) {
@@ -16,17 +17,24 @@ func handleClient(conn net.Conn) {
 			return
 		}
 
-		rawBuf := buf[:n]
-		rawStr := string(rawBuf)
+		rawStr := string(buf[:n])
 		fmt.Printf("raw str %s\n", strconv.Quote(rawStr))
 
-		strs, err := parseString(rawStr)
-		if err != nil {
-			fmt.Printf("failed to read data %+v", err)
-			continue
+		// can be multiple command
+		commands := splitCommand(rawStr)
+		for _, command := range commands {
+			handleCommand(conn, command)
 		}
-		fmt.Printf("localhost:%d got %q\n", _metaInfo.port, strs)
-
-		handleCommand(conn, strs, buf)
 	}
+}
+
+func splitCommand(rawStr string) []string {
+	if !strings.Contains(rawStr, "*") {
+		return []string{rawStr}
+	}
+	commands := strings.Split(rawStr, "*")
+	for i, command := range commands {
+		commands[i] = "*" + command
+	}
+	return commands[1:]
 }

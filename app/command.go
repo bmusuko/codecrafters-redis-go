@@ -17,7 +17,15 @@ type store struct {
 
 var _map sync.Map
 
-func handleCommand(conn net.Conn, strs []string, rawBuf []byte) {
+func handleCommand(conn net.Conn, rawStr string) {
+	rawBuf := []byte(rawStr)
+	strs, err := parseString(rawStr)
+	if err != nil {
+		fmt.Printf("failed to read data %+v", err)
+		return
+	}
+	fmt.Printf("localhost:%d got %q\n", _metaInfo.port, strs)
+
 	command := strings.ToLower(strs[0])
 
 	now := time.Now()
