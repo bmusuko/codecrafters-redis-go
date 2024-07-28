@@ -27,6 +27,6 @@ func handleClient(conn net.Conn) {
 		}
 		fmt.Printf("localhost:%d got %q\n", _metaInfo.port, strs)
 
-		handleCommand(conn, strs)
+		handleCommand(conn, strs, buf)
 	}
 }

@@ -17,7 +17,7 @@ type store struct {
 
 var _map sync.Map
 
-func handleCommand(conn net.Conn, strs []string) {
+func handleCommand(conn net.Conn, strs []string, rawBuf []byte) {
 	command := strings.ToLower(strs[0])
 
 	now := time.Now()
