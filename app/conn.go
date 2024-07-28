@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -13,18 +14,21 @@ func handleClient(conn net.Conn) {
 		buf := make([]byte, 1024)
 		n, err := conn.Read(buf)
 		if err != nil {
-			fmt.Printf("failed to read data")
+			fmt.Printf("failed to read data\n")
 			return
 		}
 		now := time.Now()
 
 		rawBuf := buf[:n]
-		strs, err := parseString(string(rawBuf))
+		rawStr := string(rawBuf)
+		fmt.Printf("raw str %s\n", strconv.Quote(rawStr))
+
+		strs, err := parseString(rawStr)
 		if err != nil {
 			fmt.Printf("failed to read data %+v", err)
-			return
+			continue
 		}
-		fmt.Printf("localhost:%d got %q", _metaInfo.port, strs)
+		fmt.Printf("localhost:%d got %q\n", _metaInfo.port, strs)
 
 		command := strings.ToLower(strs[0])
 
