@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -28,13 +29,40 @@ func handleClient(conn net.Conn) {
 	}
 }
 
+// splitCommand splits the input string only if '*' is followed by a number
 func splitCommand(rawStr string) []string {
-	if !strings.Contains(rawStr, "*") {
+	var result []string
+
+	// Regular expression to match "*<number>" pattern
+	re := regexp.MustCompile(`\*(\d+)`)
+
+	// Find all matches of the pattern
+	matches := re.FindAllStringIndex(rawStr, -1)
+
+	if len(matches) == 0 {
+		// No valid '*' followed by a number; return the original string
 		return []string{rawStr}
 	}
-	commands := strings.Split(rawStr, "*")
-	for i, command := range commands {
-		commands[i] = "*" + command
+
+	// Split the rawStr into parts based on the positions of the valid '*' patterns
+	start := 0
+	for _, match := range matches {
+		// Extract the part between the last match and the current match
+		if start < match[0] {
+			result = append(result, rawStr[start:match[0]])
+		}
+		// Include the match itself
+		result = append(result, rawStr[match[0]:match[1]])
+		start = match[1]
 	}
-	return commands[1:]
+	// Append the last part after the last match
+	if start < len(rawStr) {
+		result = append(result, rawStr[start:])
+	}
+
+	// Remove any empty strings from the result
+	for i, part := range result {
+		result[i] = strings.TrimSpace(part)
+	}
+	return result
 }
