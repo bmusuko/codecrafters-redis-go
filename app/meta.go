@@ -18,10 +18,15 @@ type metaInfo struct {
 	masterPort       int
 	masterReplID     string
 	masterReplOffset *int
+	slaves           []string
 }
 
 func (mi metaInfo) isMaster() bool {
 	return len(mi.masterHost) == 0
+}
+
+func (mi metaInfo) addSlave(addr string) {
+	mi.slaves = append(mi.slaves, addr)
 }
 
 var (

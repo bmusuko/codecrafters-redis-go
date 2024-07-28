@@ -18,7 +18,8 @@ func handleClient(conn net.Conn) {
 		}
 		now := time.Now()
 
-		rawStr := string(buf[:n])
+		rawBuf := buf[:n]
+		rawStr := string(rawBuf)
 
 		strs, err := parseString(rawStr)
 		if err != nil {
@@ -28,6 +29,12 @@ func handleClient(conn net.Conn) {
 		fmt.Printf("got %q", strs)
 
 		command := strings.ToLower(strs[0])
+
+		if command == "set" {
+			defer func() {
+				handleBroadcast(rawBuf)
+			}()
+		}
 
 		var reply string
 		switch command {
@@ -41,8 +48,10 @@ func handleClient(conn net.Conn) {
 			break
 		case "set":
 			handleSet(now, strs[1:])
-			reply = "OK"
-			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+			if _metaInfo.isMaster() {
+				reply = "OK"
+				conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+			}
 			break
 		case "get":
 			resp, ok := handleGet(now, strs[1])
@@ -67,6 +76,8 @@ func handleClient(conn net.Conn) {
 			time.Sleep(100 * time.Millisecond)
 			fullByte := getEmptyRDBByte()
 			conn.Write([]byte(fmt.Sprintf("$%d\r\n%s", len(fullByte), fullByte)))
+
+			_metaInfo.addSlave(conn.LocalAddr().String())
 		}
 	}
 }
