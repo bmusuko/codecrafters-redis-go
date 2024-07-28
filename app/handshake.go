@@ -9,7 +9,6 @@ import (
 )
 
 func handshake() {
-	fmt.Printf("master_host=%s", fmt.Sprintf("%s:%d", _metaInfo.masterHost, _metaInfo.masterPort))
 	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", _metaInfo.masterHost, _metaInfo.masterPort))
 	if err != nil {
 		fmt.Printf("failed to dial master")
@@ -50,4 +49,6 @@ func handshake() {
 		os.Exit(-1)
 	}
 	time.Sleep(time.Millisecond * 100)
+
+	go handleClient(conn)
 }
