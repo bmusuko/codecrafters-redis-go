@@ -10,7 +10,7 @@ func main() {
 
 	port := _metaInfo.port
 	// Listen for incoming connections
-	listener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", port))
+	listener, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
