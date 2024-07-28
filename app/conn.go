@@ -45,7 +45,6 @@ func handleClient(conn net.Conn) {
 			if _metaInfo.isMaster() {
 				reply = "OK"
 				conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
-
 				handleBroadcast(rawBuf)
 			}
 			break
