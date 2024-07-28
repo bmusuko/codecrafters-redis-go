@@ -71,6 +71,8 @@ func handleClient(conn net.Conn) {
 			conn.Write([]byte(fmt.Sprintf("$%d\r\n%s", len(fullByte), fullByte)))
 
 			_metaInfo.addSlave(conn)
+		default:
+			continue
 		}
 	}
 }
