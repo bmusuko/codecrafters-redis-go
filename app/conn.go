@@ -30,12 +30,6 @@ func handleClient(conn net.Conn) {
 
 		command := strings.ToLower(strs[0])
 
-		if command == "set" {
-			defer func() {
-				handleBroadcast(rawBuf)
-			}()
-		}
-
 		var reply string
 		switch command {
 		case "ping":
@@ -51,6 +45,8 @@ func handleClient(conn net.Conn) {
 			if _metaInfo.isMaster() {
 				reply = "OK"
 				conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+
+				handleBroadcast(rawBuf)
 			}
 			break
 		case "get":
