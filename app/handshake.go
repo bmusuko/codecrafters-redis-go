@@ -48,7 +48,5 @@ func handshake() {
 		fmt.Printf("failed to send second REPLCONF")
 		os.Exit(-1)
 	}
-	time.Sleep(time.Millisecond * 100)
-
 	go handleClient(conn)
 }
