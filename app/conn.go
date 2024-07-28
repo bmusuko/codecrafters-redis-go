@@ -19,9 +19,7 @@ func handleClient(conn net.Conn) {
 		now := time.Now()
 
 		rawBuf := buf[:n]
-		rawStr := string(rawBuf)
-
-		strs, err := parseString(rawStr)
+		strs, err := parseString(string(rawBuf))
 		if err != nil {
 			fmt.Printf("failed to read data %+v", err)
 			return
