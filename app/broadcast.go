@@ -15,11 +15,12 @@ func handleBroadcast(rawBuf []byte) {
 			fmt.Printf("failed to dial slave")
 			os.Exit(-1)
 		}
+		time.Sleep(100 * time.Millisecond)
 
 		// send raw buf
 		_, err = conn.Write(rawBuf)
 		if err != nil {
-			fmt.Printf("failed to send ping")
+			fmt.Printf("failed to send broadcast %s", string(rawBuf))
 			os.Exit(-1)
 		}
 
