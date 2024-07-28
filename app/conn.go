@@ -24,7 +24,7 @@ func handleClient(conn net.Conn) {
 			fmt.Printf("failed to read data %+v", err)
 			return
 		}
-		fmt.Printf("got %q", strs)
+		fmt.Printf("localhost:%d got %q", _metaInfo.port, strs)
 
 		command := strings.ToLower(strs[0])
 
