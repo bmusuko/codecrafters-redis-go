@@ -53,7 +53,7 @@ func splitCommand(rawStr string) []string {
 		if start < match[0] {
 			result = append(result, rawStr[start:match[0]])
 		}
-		// Include the match itself
+		// Include the match itself (i.e., "*<number>")
 		result = append(result, rawStr[match[0]:match[1]])
 		start = match[1]
 	}
@@ -66,5 +66,14 @@ func splitCommand(rawStr string) []string {
 	for i, part := range result {
 		result[i] = strings.TrimSpace(part)
 	}
-	return result
+
+	// Clean up any empty strings that might be the result of trimming
+	var cleanedResult []string
+	for _, part := range result {
+		if len(part) > 0 {
+			cleanedResult = append(cleanedResult, part)
+		}
+	}
+
+	return cleanedResult
 }
