@@ -23,7 +23,9 @@ func handleClient(conn net.Conn) {
 
 		// can be multiple command
 		commands := splitCommand(rawStr)
+
 		for _, command := range commands {
+			fmt.Printf("parsed command %q\n", strconv.Quote(command))
 			handleCommand(conn, command)
 		}
 	}
