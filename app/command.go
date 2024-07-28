@@ -21,7 +21,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 	rawBuf := []byte(rawStr)
 	strs, err := parseString(rawStr)
 	if err != nil {
-		fmt.Printf("failed to read data %+v", err)
+		fmt.Printf("failed to read data %+v\n", err)
 		return
 	}
 	fmt.Printf("localhost:%d got %q\n", _metaInfo.port, strs)
