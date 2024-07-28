@@ -69,7 +69,7 @@ func handleClient(conn net.Conn) {
 			if strs[1] == "listening-port" {
 				slaveAddr := fmt.Sprintf("0.0.0.0:%s", strs[2])
 				_metaInfo.addSlave(slaveAddr)
-				fmt.Printf("add slave %s", slaveAddr)
+				fmt.Printf("add slave %s\n", slaveAddr)
 			}
 
 			break
