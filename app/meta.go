@@ -21,11 +21,11 @@ type metaInfo struct {
 	slaves           []string
 }
 
-func (mi metaInfo) isMaster() bool {
+func (mi *metaInfo) isMaster() bool {
 	return len(mi.masterHost) == 0
 }
 
-func (mi metaInfo) addSlave(addr string) {
+func (mi *metaInfo) addSlave(addr string) {
 	mi.slaves = append(mi.slaves, addr)
 }
 
