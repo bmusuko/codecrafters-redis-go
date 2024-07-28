@@ -5,7 +5,6 @@ import (
 	"net"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 func handleClient(conn net.Conn) {
@@ -60,11 +59,6 @@ func splitCommand(rawStr string) []string {
 	// Append the last part after the last match
 	if start < len(rawStr) {
 		result = append(result, rawStr[start:])
-	}
-
-	// Remove any empty strings from the result
-	for i, part := range result {
-		result[i] = strings.TrimSpace(part)
 	}
 
 	// Clean up any empty strings that might be the result of trimming
