@@ -77,8 +77,8 @@ func handleClient(conn net.Conn) {
 			fullByte := getEmptyRDBByte()
 			conn.Write([]byte(fmt.Sprintf("$%d\r\n%s", len(fullByte), fullByte)))
 
-			_metaInfo.addSlave(conn.LocalAddr().String())
-			fmt.Printf("add slave %s", conn.LocalAddr().String())
+			_metaInfo.addSlave(conn.RemoteAddr().String())
+			fmt.Printf("add slave %s", conn.RemoteAddr().String())
 		}
 	}
 }
