@@ -64,7 +64,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 	case "replconf":
 		if len(strs) == 3 {
 			if strs[1] == "GETACK" && strs[2] == "*" {
-				conn.Write([]byte("*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$1\r\n0\r\n")
+				conn.Write([]byte("*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$1\r\n0\r\n"))
 			}
 		} else {
 			reply = "OK"
