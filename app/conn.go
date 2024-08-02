@@ -45,30 +45,20 @@ func splitCommand(rawStr string) []string {
 		return []string{rawStr}
 	}
 
+	fmt.Printf("\nmatches %q\n", matches)
+
 	// Split the rawStr into parts based on the positions of the valid '*' patterns
 	start := 0
 	for _, match := range matches {
 		// Extract the part between the last match and the current match
-		if start < match[0] {
-			result = append(result, rawStr[start:match[0]])
-		}
-		// Include the match itself (i.e., "*<number>")
-		result = append(result, rawStr[match[0]:match[1]])
-		start = match[1]
+		result = append(result, rawStr[start:match[0]])
+
+		start = match[0]
 	}
-	
+
 	// Append the last part after the last match
 	if start < len(rawStr) {
 		result = append(result, rawStr[start:])
 	}
-
-	// Clean up any empty strings that might be the result of trimming
-	var cleanedResult []string
-	for _, part := range result {
-		if len(part) > 0 {
-			cleanedResult = append(cleanedResult, part)
-		}
-	}
-
-	return cleanedResult
+	return result
 }

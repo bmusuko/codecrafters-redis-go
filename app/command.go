@@ -62,8 +62,14 @@ func handleCommand(conn net.Conn, rawStr string) {
 		sendBulkString(conn, replies)
 		break
 	case "replconf":
-		reply = "OK"
-		conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+		if len(strs) == 3 {
+			if strs[1] == "GETACK" && strs[2] == "*" {
+				conn.Write([]byte("*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$1\r\n0\r\n")
+			}
+		} else {
+			reply = "OK"
+			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+		}
 		break
 	case "psync":
 		conn.Write([]byte(fmt.Sprintf("+FULLRESYNC %s %d\r\n", _metaInfo.masterReplID, *_metaInfo.masterReplOffset)))
