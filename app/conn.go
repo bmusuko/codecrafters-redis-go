@@ -56,6 +56,7 @@ func splitCommand(rawStr string) []string {
 		result = append(result, rawStr[match[0]:match[1]])
 		start = match[1]
 	}
+	
 	// Append the last part after the last match
 	if start < len(rawStr) {
 		result = append(result, rawStr[start:])
