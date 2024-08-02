@@ -27,6 +27,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 	fmt.Printf("localhost:%d got %q\n", _metaInfo.port, strs)
 
 	command := strings.ToLower(strs[0])
+	byteLen := len(rawBuf)
 
 	now := time.Now()
 	var reply string
@@ -63,7 +64,8 @@ func handleCommand(conn net.Conn, rawStr string) {
 		break
 	case "replconf":
 		if len(strs) == 3 && strs[1] == "GETACK" && strs[2] == "*" {
-			conn.Write([]byte("*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$1\r\n0\r\n"))
+			length := fmt.Sprintf("%d", _metaInfo.processedBytes)
+			conn.Write([]byte(fmt.Sprintf("*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$%d\r\n%s\r\n", len(length), length)))
 		} else {
 			reply = "OK"
 			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
@@ -77,6 +79,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 
 		_metaInfo.addSlave(conn)
 	}
+	_metaInfo.processedBytes += byteLen
 }
 
 func handleSet(now time.Time, strs []string) {

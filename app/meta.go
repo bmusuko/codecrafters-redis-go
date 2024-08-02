@@ -20,6 +20,7 @@ type metaInfo struct {
 	masterReplID     string
 	masterReplOffset *int
 	slaves           []net.Conn
+	processedBytes   int
 }
 
 func (mi *metaInfo) isMaster() bool {
