@@ -52,7 +52,6 @@ func splitCommand(rawStr string) []string {
 	for _, match := range matches {
 		// Extract the part between the last match and the current match
 		result = append(result, rawStr[start:match[0]])
-
 		start = match[0]
 	}
 
@@ -60,5 +59,13 @@ func splitCommand(rawStr string) []string {
 	if start < len(rawStr) {
 		result = append(result, rawStr[start:])
 	}
-	return result
+
+	var finalResult []string
+	for _, r := range result {
+		if len(r) != 0 {
+			finalResult = append(finalResult, r)
+		}
+	}
+
+	return finalResult
 }
