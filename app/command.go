@@ -31,10 +31,12 @@ func handleCommand(conn net.Conn, rawStr string) {
 
 	now := time.Now()
 	var reply string
+	var shouldUpdateByte bool
 	switch command {
 	case "ping":
 		reply = "PONG"
 		conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+		shouldUpdateByte = true
 		break
 	case "echo":
 		reply = strs[1]
@@ -47,6 +49,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 			handleBroadcast(rawBuf)
 		}
+		shouldUpdateByte = true
 		break
 	case "get":
 		resp, ok := handleGet(now, strs[1])
@@ -70,6 +73,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 			reply = "OK"
 			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 		}
+		shouldUpdateByte = true
 		break
 	case "psync":
 		conn.Write([]byte(fmt.Sprintf("+FULLRESYNC %s %d\r\n", _metaInfo.masterReplID, *_metaInfo.masterReplOffset)))
@@ -79,7 +83,9 @@ func handleCommand(conn net.Conn, rawStr string) {
 
 		_metaInfo.addSlave(conn)
 	}
-	_metaInfo.processedBytes += byteLen
+	if !_metaInfo.isMaster() && shouldUpdateByte {
+		_metaInfo.processedBytes += byteLen
+	}
 }
 
 func handleSet(now time.Time, strs []string) {
