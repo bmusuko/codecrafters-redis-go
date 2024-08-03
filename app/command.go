@@ -34,8 +34,10 @@ func handleCommand(conn net.Conn, rawStr string) {
 	var shouldUpdateByte bool
 	switch command {
 	case "ping":
-		reply = "PONG"
-		conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+		if _metaInfo.isMaster() {
+			reply = "PONG"
+			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
+		}
 		shouldUpdateByte = true
 		break
 	case "echo":

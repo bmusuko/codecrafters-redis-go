@@ -45,8 +45,6 @@ func splitCommand(rawStr string) []string {
 		return []string{rawStr}
 	}
 
-	fmt.Printf("\nmatches %q\n", matches)
-
 	// Split the rawStr into parts based on the positions of the valid '*' patterns
 	start := 0
 	for _, match := range matches {
