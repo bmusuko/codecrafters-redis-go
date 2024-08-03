@@ -84,6 +84,8 @@ func handleCommand(conn net.Conn, rawStr string) {
 		conn.Write([]byte(fmt.Sprintf("$%d\r\n%s", len(fullByte), fullByte)))
 
 		_metaInfo.addSlave(conn)
+	case "wait":
+		conn.Write([]byte(fmt.Sprintf("+0\r\n")))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
