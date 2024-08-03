@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 )
 
 func handleBroadcast(rawBuf []byte) {
@@ -14,7 +13,5 @@ func handleBroadcast(rawBuf []byte) {
 			fmt.Printf("failed to send broadcast %s", string(rawBuf))
 			os.Exit(-1)
 		}
-
-		time.Sleep(100 * time.Millisecond)
 	}
 }
