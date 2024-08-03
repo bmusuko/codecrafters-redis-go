@@ -67,7 +67,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 		break
 	case "replconf":
 		if len(strs) == 3 && strs[1] == "GETACK" && strs[2] == "*" {
-			length := fmt.Sprintf("%d", _metaInfo.processedBytes)
+			length := fmt.Sprintf("%d", _metaInfo.processedBytes.Load())
 			conn.Write([]byte(fmt.Sprintf("*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$%d\r\n%s\r\n", len(length), length)))
 		} else {
 			reply = "OK"
@@ -84,7 +84,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 		_metaInfo.addSlave(conn)
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
-		_metaInfo.processedBytes += byteLen
+		_metaInfo.processedBytes.Add(int32(byteLen))
 	}
 }
 

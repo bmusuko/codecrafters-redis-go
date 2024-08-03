@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync/atomic"
 )
 
 const (
@@ -20,7 +21,7 @@ type metaInfo struct {
 	masterReplID     string
 	masterReplOffset *int
 	slaves           []net.Conn
-	processedBytes   int
+	processedBytes   atomic.Int32
 }
 
 func (mi *metaInfo) isMaster() bool {
