@@ -22,6 +22,10 @@ type metaInfo struct {
 	masterReplOffset *int
 	slaves           []net.Conn
 	processedBytes   atomic.Int32
+
+	// command related
+	lastCommandMS   atomic.Int64
+	processedSlaves atomic.Int32
 }
 
 func (mi *metaInfo) isMaster() bool {

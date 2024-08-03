@@ -49,7 +49,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 		if _metaInfo.isMaster() {
 			reply = "OK"
 			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
-			handleBroadcast(rawBuf)
+			handleBroadcast(rawBuf, now.UnixMilli())
 		}
 		shouldUpdateByte = true
 		break
@@ -85,7 +85,8 @@ func handleCommand(conn net.Conn, rawStr string) {
 
 		_metaInfo.addSlave(conn)
 	case "wait":
-		conn.Write([]byte(fmt.Sprintf(":%d\r\n", len(_metaInfo.slaves))))
+		slaves := handleWait(strs[1], strs[2])
+		conn.Write([]byte(fmt.Sprintf(":%d\r\n", slaves)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
@@ -147,4 +148,23 @@ func handleInfo() []string {
 	}
 
 	return reply
+}
+
+func handleWait(replicaStr, waitMSStr string) int32 {
+	replica, err := strconv.Atoi(replicaStr)
+	if err != nil {
+		fmt.Printf("%v", err)
+		os.Exit(-1)
+	}
+	waitMS, err := strconv.Atoi(waitMSStr)
+	if err != nil {
+		fmt.Printf("%v", err)
+		os.Exit(-1)
+	}
+
+	if _metaInfo.processedSlaves.Load() >= int32(replica) {
+		return _metaInfo.processedSlaves.Load()
+	}
+	time.Sleep(time.Duration(waitMS) * time.Millisecond)
+	return _metaInfo.processedSlaves.Load()
 }
