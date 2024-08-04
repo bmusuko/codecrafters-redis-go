@@ -90,7 +90,8 @@ func handleCommand(conn net.Conn, rawStr string) {
 
 		_metaInfo.addSlave(conn)
 	case "wait":
-		handleWait(conn, strs[1], strs[2])
+		num := handleWait(strs[1], strs[2])
+		conn.Write([]byte(fmt.Sprintf(":%d\r\n", num)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
@@ -154,11 +155,7 @@ func handleInfo() []string {
 	return reply
 }
 
-func handleWait(conn net.Conn, replicaStr, waitMSStr string) (slaves int32) {
-	defer func() {
-		conn.Write([]byte(fmt.Sprintf(":%d\r\n", slaves)))
-	}()
-
+func handleWait(replicaStr, waitMSStr string) (slaves int32) {
 	for _, slave := range _metaInfo.slaves {
 		go func() {
 			slave.Write([]byte("*3\r\n$8\r\nREPLCONF\r\n$6\r\nGETACK\r\n$1\r\n*\r\n"))
@@ -173,8 +170,10 @@ func handleWait(conn net.Conn, replicaStr, waitMSStr string) (slaves int32) {
 	for acks < replica {
 		select {
 		case <-ackReceived:
+			fmt.Printf("received ack\n")
 			acks++
 		case <-timer:
+			fmt.Printf("timeout reached %d\n", waitMS)
 			break
 		}
 	}
