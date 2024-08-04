@@ -10,14 +10,16 @@ func handleBroadcast(rawBuf []byte, commandMS int64) {
 		_metaInfo.processedSlaves.Store(0)
 	}
 	for _, slave := range _metaInfo.slaves {
-		// send raw buf
-		_, err := slave.Write(rawBuf)
-		if err != nil {
-			fmt.Printf("failed to send broadcast %s", string(rawBuf))
-			continue
-		}
-		if _metaInfo.lastCommandMS.Load() == commandMS {
-			_metaInfo.processedSlaves.Add(1)
-		}
+		go func() {
+			// send raw buf
+			_, err := slave.Write(rawBuf)
+			if err != nil {
+				fmt.Printf("failed to send broadcast %s", string(rawBuf))
+				return
+			}
+			if _metaInfo.lastCommandMS.Load() == commandMS {
+				_metaInfo.processedSlaves.Add(1)
+			}
+		}()
 	}
 }
