@@ -90,7 +90,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 
 		_metaInfo.addSlave(conn)
 	case "wait":
-		go handleWait(conn, strs[1], strs[2])
+		handleWait(conn, strs[1], strs[2])
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
