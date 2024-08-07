@@ -176,7 +176,9 @@ func handleWait(conn net.Conn, replicaStr, waitMSStr string) {
 		case <-timer:
 			fmt.Printf("timeout reached %d\n", waitMS)
 			conn.Write([]byte(fmt.Sprintf(":%d\r\n", ackNum)))
+			return
 		}
 	}
 	conn.Write([]byte(fmt.Sprintf(":%d\r\n", ackNum)))
+	return
 }
