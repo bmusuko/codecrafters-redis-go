@@ -17,7 +17,7 @@ type store struct {
 
 var _map sync.Map
 var (
-	ackReceived = make(chan bool, 500)
+	ackReceived = make(chan bool)
 )
 
 func handleCommand(conn net.Conn, rawStr string) {
@@ -158,6 +158,7 @@ func handleInfo() []string {
 
 func handleWait(conn net.Conn, replicaStr, waitMSStr string) (slaves int32) {
 	defer func() {
+		fmt.Printf("reply to wait, result=%d\n", slaves)
 		conn.Write([]byte(fmt.Sprintf(":%d\r\n", slaves)))
 	}()
 
