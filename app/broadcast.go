@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 )
 
 func handleBroadcast(rawBuf []byte, commandMS int64) {
@@ -10,9 +11,9 @@ func handleBroadcast(rawBuf []byte, commandMS int64) {
 		_metaInfo.processedSlaves.Store(0)
 	}
 	for _, slave := range _metaInfo.slaves {
-		go func() {
+		go func(_slave net.Conn) {
 			// send raw buf
-			_, err := slave.Write(rawBuf)
+			_, err := _slave.Write(rawBuf)
 			if err != nil {
 				fmt.Printf("failed to send broadcast %s", string(rawBuf))
 				return
@@ -20,6 +21,6 @@ func handleBroadcast(rawBuf []byte, commandMS int64) {
 			if _metaInfo.lastCommandMS.Load() == commandMS {
 				_metaInfo.processedSlaves.Add(1)
 			}
-		}()
+		}(slave)
 	}
 }

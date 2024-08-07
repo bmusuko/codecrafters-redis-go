@@ -157,9 +157,9 @@ func handleInfo() []string {
 
 func handleWait(replicaStr, waitMSStr string) (slaves int32) {
 	for _, slave := range _metaInfo.slaves {
-		go func() {
-			slave.Write([]byte("*3\r\n$8\r\nREPLCONF\r\n$6\r\nGETACK\r\n$1\r\n*\r\n"))
-		}()
+		go func(_slave net.Conn) {
+			_slave.Write([]byte("*3\r\n$8\r\nREPLCONF\r\n$6\r\nGETACK\r\n$1\r\n*\r\n"))
+		}(slave)
 	}
 
 	replica, _ := strconv.Atoi(replicaStr)
