@@ -180,7 +180,7 @@ func handleWait(conn net.Conn, replicaStr, waitMSStr string) (slaves int32) {
 			acks++
 		case <-timer:
 			fmt.Printf("timeout reached %d\n", waitMS)
-			break
+			return int32(acks)
 		}
 	}
 	return int32(acks)
