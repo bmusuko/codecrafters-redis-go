@@ -165,7 +165,7 @@ func handleWait(replicaStr, waitMSStr string) (slaves int32) {
 	replica, _ := strconv.Atoi(replicaStr)
 	waitMS, _ := strconv.Atoi(waitMSStr)
 
-	timer := time.After(time.Duration(waitMS-100) * time.Millisecond)
+	timer := time.After(time.Duration(waitMS) * time.Millisecond)
 	acks := 0
 	for acks < replica {
 		select {
