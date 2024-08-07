@@ -80,6 +80,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 		shouldUpdateByte = true
 		if len(strs) == 3 && strs[1] == "ACK" {
 			ackReceived <- true
+			fmt.Printf("thx for ack %s \n", conn.RemoteAddr().String())
 		}
 		break
 	case "psync":
