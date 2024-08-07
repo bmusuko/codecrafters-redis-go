@@ -156,12 +156,7 @@ func handleInfo() []string {
 	return reply
 }
 
-func handleWait(conn net.Conn, replicaStr, waitMSStr string) (slaves int32) {
-	defer func() {
-		fmt.Printf("reply to wait, result=%d\n", slaves)
-		conn.Write([]byte(fmt.Sprintf(":%d\r\n", slaves)))
-	}()
-
+func handleWait(conn net.Conn, replicaStr, waitMSStr string) {
 	for _, slave := range _metaInfo.slaves {
 		go func(_slave net.Conn) {
 			_slave.Write([]byte("*3\r\n$8\r\nREPLCONF\r\n$6\r\nGETACK\r\n$1\r\n*\r\n"))
@@ -171,17 +166,17 @@ func handleWait(conn net.Conn, replicaStr, waitMSStr string) (slaves int32) {
 	replica, _ := strconv.Atoi(replicaStr)
 	waitMS, _ := strconv.Atoi(waitMSStr)
 
-	timer := time.After(time.Duration(waitMS-100) * time.Millisecond)
-	acks := 0
-	for acks < replica {
+	timer := time.After(time.Duration(waitMS) * time.Millisecond)
+	ackNum := 0
+	for ackNum < replica {
 		select {
 		case <-ackReceived:
 			fmt.Printf("received ack\n")
-			acks++
+			ackNum++
 		case <-timer:
 			fmt.Printf("timeout reached %d\n", waitMS)
-			return int32(acks)
+			conn.Write([]byte(fmt.Sprintf(":%d\r\n", ackNum)))
 		}
 	}
-	return int32(acks)
+	conn.Write([]byte(fmt.Sprintf(":%d\r\n", ackNum)))
 }
