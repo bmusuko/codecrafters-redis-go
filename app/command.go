@@ -73,15 +73,14 @@ func handleCommand(conn net.Conn, rawStr string) {
 		if len(strs) == 3 && strs[1] == "GETACK" && strs[2] == "*" {
 			length := fmt.Sprintf("%d", _metaInfo.processedBytes.Load())
 			conn.Write([]byte(fmt.Sprintf("*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$%d\r\n%s\r\n", len(length), length)))
+		} else if len(strs) == 3 && strs[1] == "ACK" {
+			ackReceived <- true
+			fmt.Printf("thx for ack %s \n", conn.RemoteAddr().String())
 		} else {
 			reply = "OK"
 			conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 		}
 		shouldUpdateByte = true
-		if len(strs) == 3 && strs[1] == "ACK" {
-			ackReceived <- true
-			fmt.Printf("thx for ack %s \n", conn.RemoteAddr().String())
-		}
 		break
 	case "psync":
 		conn.Write([]byte(fmt.Sprintf("+FULLRESYNC %s %d\r\n", _metaInfo.masterReplID, *_metaInfo.masterReplOffset)))
