@@ -26,6 +26,7 @@ type metaInfo struct {
 	// command related
 	lastCommandMS   atomic.Int64
 	processedSlaves atomic.Int32
+	startSet        atomic.Bool
 }
 
 func (mi *metaInfo) isMaster() bool {

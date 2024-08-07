@@ -56,6 +56,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 			handleBroadcast(rawBuf, now.UnixMilli())
 		}
 		shouldUpdateByte = true
+		_metaInfo.startSet.Store(true)
 		break
 	case "get":
 		resp, ok := handleGet(now, strs[1])
@@ -94,7 +95,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 	case "wait":
 		go handleWait(conn, strs[1], strs[2])
 	}
-	if shouldUpdateByte {
+	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
 	}
 }
@@ -168,7 +169,7 @@ func handleWait(conn net.Conn, replicaStr, waitMSStr string) {
 
 	timer := time.After(time.Duration(waitMS) * time.Millisecond)
 	ackNum := 0
-	if _metaInfo.processedBytes.Load() == 0 {
+	if !_metaInfo.startSet.Load() {
 		conn.Write([]byte(fmt.Sprintf(":%d\r\n", len(_metaInfo.slaves))))
 		return
 	}
