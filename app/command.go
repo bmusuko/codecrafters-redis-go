@@ -16,7 +16,9 @@ type store struct {
 }
 
 var _map sync.Map
-var ackReceived chan bool
+var (
+	ackReceived = make(chan bool, 500)
+)
 
 func handleCommand(conn net.Conn, rawStr string) {
 	rawBuf := []byte(rawStr)
