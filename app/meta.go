@@ -27,6 +27,10 @@ type metaInfo struct {
 	lastCommandMS   atomic.Int64
 	processedSlaves atomic.Int32
 	startSet        atomic.Bool
+
+	// config
+	dir        string
+	dbFileName string
 }
 
 func (mi *metaInfo) isMaster() bool {
@@ -47,6 +51,9 @@ func initMeta() {
 
 	replicaOf := ""
 	flag.StringVar(&replicaOf, "replicaof", "", "Replication info")
+	flag.StringVar(&_metaInfo.dir, "dir", "", "Dir")
+	flag.StringVar(&_metaInfo.dbFileName, "dbfilename", "", "DB file name")
+
 	flag.Parse()
 
 	if len(replicaOf) > 0 {

@@ -94,6 +94,12 @@ func handleCommand(conn net.Conn, rawStr string) {
 		_metaInfo.addSlave(conn)
 	case "wait":
 		go handleWait(conn, strs[1], strs[2])
+	case "config":
+		if strs[2] == "dir" {
+			conn.Write([]byte(fmt.Sprintf("*2\r\n$3\r\ndir\r\n$%d\r\n%s\r\n", len(_metaInfo.dir), _metaInfo.dir)))
+		} else if strs[2] == "dbfilename" {
+			conn.Write([]byte(fmt.Sprintf("*2\r\n$10\r\ndbfilename\r\n$%d\r\n%s\r\n", len(_metaInfo.dbFileName), _metaInfo.dbFileName)))
+		}
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
