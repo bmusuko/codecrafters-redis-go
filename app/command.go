@@ -168,6 +168,10 @@ func handleWait(conn net.Conn, replicaStr, waitMSStr string) {
 
 	timer := time.After(time.Duration(waitMS) * time.Millisecond)
 	ackNum := 0
+	if _metaInfo.processedBytes.Load() == 0 {
+		conn.Write([]byte(fmt.Sprintf(":%d\r\n", len(_metaInfo.slaves))))
+		return
+	}
 	for ackNum < replica {
 		select {
 		case <-ackReceived:
