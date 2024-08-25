@@ -116,6 +116,9 @@ func handleCommand(conn net.Conn, rawStr string) {
 			response := fmt.Sprintf(":%d\r\n", res)
 			conn.Write([]byte(response))
 		}
+	case "multi":
+		response := fmt.Sprintf("+OK\r\n")
+		conn.Write([]byte(response))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
