@@ -126,6 +126,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 			conn.Write([]byte(response))
 			return
 		}
+		conn.Write([]byte("*0\r\n"))
 		_metaInfo.isMulti = false
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
