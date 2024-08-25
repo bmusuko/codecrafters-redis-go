@@ -209,6 +209,14 @@ func handleKeys() []string {
 			// Handle the case where the key is not a string
 			return true
 		}
+		value, ok := v.(store)
+		if !ok {
+			return true
+		}
+		if !value.expireAt.IsZero() && value.expireAt.Before(time.Now()) {
+			return true
+		}
+
 		_keys = append(_keys, key)
 		return true
 	})
