@@ -232,7 +232,11 @@ func handleKeys() []string {
 func handleIncr(key string) (int64, bool) {
 	res, ok := _map.Load(key)
 	if !ok {
-		return 0, false
+		_map.Store(key, store{
+			value: "1",
+		})
+
+		return 1, true
 	}
 
 	value, ok := res.(store)
