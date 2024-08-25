@@ -34,7 +34,7 @@ type metaInfo struct {
 	dbFileName string
 
 	// multi
-	isMulti bool
+	isMulti map[string]bool
 }
 
 func (mi *metaInfo) isMaster() bool {

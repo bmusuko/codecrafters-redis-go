@@ -117,17 +117,17 @@ func handleCommand(conn net.Conn, rawStr string) {
 			conn.Write([]byte(response))
 		}
 	case "multi":
+		_metaInfo.isMulti[conn.RemoteAddr().String()] = true
 		response := fmt.Sprintf("+OK\r\n")
-		_metaInfo.isMulti = true
 		conn.Write([]byte(response))
 	case "exec":
-		if !_metaInfo.isMulti {
+		if !_metaInfo.isMulti[conn.RemoteAddr().String()] {
 			response := fmt.Sprintf("-ERR EXEC without MULTI\r\n")
 			conn.Write([]byte(response))
 			return
 		}
 		conn.Write([]byte("*0\r\n"))
-		_metaInfo.isMulti = false
+		_metaInfo.isMulti[conn.RemoteAddr().String()] = false
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
