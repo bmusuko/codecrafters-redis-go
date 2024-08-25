@@ -34,7 +34,8 @@ type metaInfo struct {
 	dbFileName string
 
 	// multi
-	isMulti map[string]bool
+	isMulti    map[string]bool
+	pendingTxn map[string][]string
 }
 
 func (mi *metaInfo) isMaster() bool {
@@ -77,6 +78,8 @@ func initMeta() {
 		initRDB(filepath.Join(_metaInfo.dir, _metaInfo.dbFileName))
 	}
 
+	_metaInfo.isMulti = make(map[string]bool)
+	_metaInfo.pendingTxn = make(map[string][]string)
 }
 
 func getEmptyRDBByte() []byte {

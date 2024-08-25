@@ -49,6 +49,11 @@ func handleCommand(conn net.Conn, rawStr string) {
 		conn.Write([]byte(fmt.Sprintf("+%s\r\n", reply)))
 		break
 	case "set":
+		if _metaInfo.isMulti[conn.RemoteAddr().String()] {
+			_metaInfo.pendingTxn[conn.RemoteAddr().String()] = append(_metaInfo.pendingTxn[conn.RemoteAddr().String()], strings.Join(strs, " "))
+			conn.Write([]byte(fmt.Sprintf("+QUEUED\r\n")))
+			return
+		}
 		handleSet(now, strs[1:])
 		if _metaInfo.isMaster() {
 			reply = "OK"
@@ -109,6 +114,11 @@ func handleCommand(conn net.Conn, rawStr string) {
 		}
 		conn.Write([]byte(response))
 	case "incr":
+		if _metaInfo.isMulti[conn.RemoteAddr().String()] {
+			_metaInfo.pendingTxn[conn.RemoteAddr().String()] = append(_metaInfo.pendingTxn[conn.RemoteAddr().String()], strings.Join(strs, " "))
+			conn.Write([]byte(fmt.Sprintf("+QUEUED\r\n")))
+			return
+		}
 		res, ok := handleIncr(strs[1])
 		if !ok {
 			conn.Write([]byte("-ERR value is not an integer or out of range\r\n"))
@@ -128,6 +138,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 		}
 		conn.Write([]byte("*0\r\n"))
 		_metaInfo.isMulti[conn.RemoteAddr().String()] = false
+		_metaInfo.pendingTxn[conn.RemoteAddr().String()] = nil
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
