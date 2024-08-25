@@ -5,6 +5,7 @@ import (
 	"flag"
 	"net"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -67,6 +68,10 @@ func initMeta() {
 	} else {
 		_metaInfo.masterReplID = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
 		_metaInfo.masterReplOffset = ptr(0)
+	}
+
+	if _metaInfo.dir != "" && _metaInfo.dbFileName != "" {
+		initRDB(filepath.Join(_metaInfo.dir, _metaInfo.dbFileName))
 	}
 
 }

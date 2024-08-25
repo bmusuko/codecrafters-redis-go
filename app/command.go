@@ -100,6 +100,13 @@ func handleCommand(conn net.Conn, rawStr string) {
 		} else if strs[2] == "dbfilename" {
 			conn.Write([]byte(fmt.Sprintf("*2\r\n$10\r\ndbfilename\r\n$%d\r\n%s\r\n", len(_metaInfo.dbFileName), _metaInfo.dbFileName)))
 		}
+	case "keys":
+		_keys := handleKeys()
+		response := fmt.Sprintf("*%d\r\n", len(_keys))
+		for _, k := range _keys {
+			response = fmt.Sprintf("%s$%d\r\n%s\r\n", response, len(k), k)
+		}
+		conn.Write([]byte(response))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
@@ -192,4 +199,18 @@ func handleWait(conn net.Conn, replicaStr, waitMSStr string) {
 	}
 	conn.Write([]byte(fmt.Sprintf(":%d\r\n", ackNum)))
 	return
+}
+
+func handleKeys() []string {
+	_keys := make([]string, 0)
+	_map.Range(func(k, v interface{}) bool {
+		key, ok := k.(string)
+		if !ok {
+			// Handle the case where the key is not a string
+			return true
+		}
+		_keys = append(_keys, key)
+		return true
+	})
+	return _keys
 }
