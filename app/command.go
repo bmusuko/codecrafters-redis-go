@@ -108,6 +108,10 @@ func handleCommand(conn net.Conn, rawStr string) {
 			response = fmt.Sprintf("%s$%d\r\n%s\r\n", response, len(k), k)
 		}
 		conn.Write([]byte(response))
+	case "incr":
+		res, _ := handleIncr(strs[1])
+		response := fmt.Sprintf(":%d\r\n", res)
+		conn.Write([]byte(response))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
@@ -223,4 +227,31 @@ func handleKeys() []string {
 		return true
 	})
 	return _keys
+}
+
+func handleIncr(key string) (int64, bool) {
+	res, ok := _map.Load(key)
+	if !ok {
+		return 0, false
+	}
+
+	value, ok := res.(store)
+	if !ok {
+		return 0, false
+	}
+
+	if value.withExpire && value.expireAt.Before(time.Now()) {
+		return 0, false
+	}
+
+	intValue, err := strconv.Atoi(value.value)
+	if err != nil {
+		fmt.Printf("err := %+v\n", err)
+		return 0, false
+	}
+
+	newValue := value
+	newValue.value = strconv.Itoa(intValue + 1)
+	_map.Store(key, newValue)
+	return int64(intValue + 1), true
 }
