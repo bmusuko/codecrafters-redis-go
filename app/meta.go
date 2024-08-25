@@ -32,6 +32,9 @@ type metaInfo struct {
 	// config
 	dir        string
 	dbFileName string
+
+	// multi
+	isMulti bool
 }
 
 func (mi *metaInfo) isMaster() bool {
