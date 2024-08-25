@@ -109,9 +109,13 @@ func handleCommand(conn net.Conn, rawStr string) {
 		}
 		conn.Write([]byte(response))
 	case "incr":
-		res, _ := handleIncr(strs[1])
-		response := fmt.Sprintf(":%d\r\n", res)
-		conn.Write([]byte(response))
+		res, ok := handleIncr(strs[1])
+		if !ok {
+			conn.Write([]byte("-ERR value is not an integer or out of range\r\n"))
+		} else {
+			response := fmt.Sprintf(":%d\r\n", res)
+			conn.Write([]byte(response))
+		}
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
