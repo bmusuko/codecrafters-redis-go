@@ -11,8 +11,9 @@ import (
 )
 
 type store struct {
-	value    string
-	expireAt time.Time
+	value      string
+	withExpire bool
+	expireAt   time.Time
 }
 
 var _map sync.Map
@@ -129,6 +130,7 @@ func handleSet(now time.Time, strs []string) {
 				os.Exit(-1)
 			}
 			stored.expireAt = now.Add(time.Millisecond * time.Duration(ms))
+			stored.withExpire = true
 		}
 	}
 
@@ -144,7 +146,7 @@ func handleGet(now time.Time, key string) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	if expireAt := stored.expireAt; !expireAt.IsZero() && expireAt.Before(now) {
+	if expireAt := stored.expireAt; stored.withExpire && expireAt.Before(now) {
 		return "", false
 	}
 
@@ -213,7 +215,7 @@ func handleKeys() []string {
 		if !ok {
 			return true
 		}
-		if !value.expireAt.IsZero() && value.expireAt.Before(time.Now()) {
+		if value.withExpire && value.expireAt.Before(time.Now()) {
 			return true
 		}
 

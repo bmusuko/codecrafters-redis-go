@@ -15,6 +15,7 @@ type keys struct {
 	value      string
 	expireTime uint64
 	isMS       bool
+	withExpire bool
 }
 
 func initRDB(path string) {
@@ -43,6 +44,7 @@ func initRDB(path string) {
 			} else {
 				stored.expireAt = time.Unix(int64(k.expireTime), 0)
 			}
+			stored.withExpire = true
 		}
 
 		_map.Store(key, stored)
@@ -64,12 +66,14 @@ func parseDB(database []byte) []keys {
 			expiry := binary.BigEndian.Uint64(database[i : i+4])
 			curr.isMS = false
 			curr.expireTime = expiry
+			curr.withExpire = true
 			i += 4
 		} else if database[i] == byte('\xFC') {
 			i += 1
 			expiry := binary.BigEndian.Uint64(database[i : i+8])
 			curr.isMS = true
 			curr.expireTime = expiry
+			curr.withExpire = true
 			i += 8
 		}
 
