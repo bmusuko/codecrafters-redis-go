@@ -65,7 +65,7 @@ func parseDB(database []byte) []keys {
 			curr.isMS = false
 			curr.expireTime = expiry
 			i += 4
-		} else if database[i] == byte('\xFD') {
+		} else if database[i] == byte('\xFC') {
 			i += 1
 			expiry := binary.BigEndian.Uint64(database[i : i+8])
 			curr.isMS = true
