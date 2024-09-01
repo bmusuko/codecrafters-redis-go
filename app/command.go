@@ -135,6 +135,15 @@ func handleCommand(conn net.Conn, rawStr string) {
 		_metaInfo.isMulti[conn.RemoteAddr().String()] = true
 		response := fmt.Sprintf("+OK\r\n")
 		conn.Write([]byte(response))
+	case "discard":
+		if !_metaInfo.isMulti[conn.RemoteAddr().String()] {
+			response := fmt.Sprintf("-ERR DISCARD without MULTI\r\n")
+			conn.Write([]byte(response))
+			return
+		}
+		conn.Write([]byte("+OK\r\n"))
+		_metaInfo.isMulti[conn.RemoteAddr().String()] = false
+		_metaInfo.pendingTxn[conn.RemoteAddr().String()] = nil
 	case "exec":
 		if !_metaInfo.isMulti[conn.RemoteAddr().String()] {
 			response := fmt.Sprintf("-ERR EXEC without MULTI\r\n")
