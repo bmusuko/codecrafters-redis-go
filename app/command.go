@@ -65,6 +65,11 @@ func handleCommand(conn net.Conn, rawStr string) {
 		_metaInfo.startSet.Store(true)
 		break
 	case "get":
+		if _metaInfo.isMulti[conn.RemoteAddr().String()] {
+			_metaInfo.pendingTxn[conn.RemoteAddr().String()] = append(_metaInfo.pendingTxn[conn.RemoteAddr().String()], strings.Join(strs, " "))
+			conn.Write([]byte(fmt.Sprintf("+QUEUED\r\n")))
+			return
+		}
 		resp, ok := handleGet(now, strs[1])
 		if ok {
 			reply = resp
@@ -136,7 +141,8 @@ func handleCommand(conn net.Conn, rawStr string) {
 			conn.Write([]byte(response))
 			return
 		}
-		conn.Write([]byte("*0\r\n"))
+		res := handleExec(conn)
+		conn.Write([]byte(fmt.Sprintf("%s", res)))
 		_metaInfo.isMulti[conn.RemoteAddr().String()] = false
 		_metaInfo.pendingTxn[conn.RemoteAddr().String()] = nil
 	}
@@ -285,4 +291,32 @@ func handleIncr(key string) (int64, bool) {
 	newValue.value = strconv.Itoa(intValue + 1)
 	_map.Store(key, newValue)
 	return int64(intValue + 1), true
+}
+
+func handleExec(conn net.Conn) string {
+	//var respArr []string
+
+	pendingTxns := _metaInfo.pendingTxn[conn.RemoteAddr().String()]
+	for _, pendingTxn := range pendingTxns {
+		strs := strings.Split(pendingTxn, " ")
+
+		// very redundant, but that's non-prod code works
+		// only refactor if needed, and worth the effort
+
+		command := strings.ToLower(strs[0])
+
+		switch command {
+		case "get":
+			fmt.Printf("handle %s\n", command)
+		case "set":
+			fmt.Printf("handle %s\n", command)
+		case "incr":
+			fmt.Printf("handle %s\n", command)
+		default:
+			fmt.Printf("unhandled %s\n", command)
+		}
+
+	}
+
+	return "*0\r\n"
 }
