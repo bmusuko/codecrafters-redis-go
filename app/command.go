@@ -154,6 +154,9 @@ func handleCommand(conn net.Conn, rawStr string) {
 		conn.Write([]byte(fmt.Sprintf("%s", res)))
 		_metaInfo.isMulti[conn.RemoteAddr().String()] = false
 		_metaInfo.pendingTxn[conn.RemoteAddr().String()] = nil
+	case "type":
+		res := handleType(strs[1])
+		conn.Write([]byte(fmt.Sprintf("+%s\r\n", res)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
@@ -343,4 +346,12 @@ func handleExec(conn net.Conn) string {
 	ans := fmt.Sprintf("*%d\r\n", len(respArr))
 
 	return ans + strings.Join(respArr, "")
+}
+
+func handleType(key string) string {
+	_, ok := handleGet(time.Now(), key)
+	if !ok {
+		return "none"
+	}
+	return "string"
 }
