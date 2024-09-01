@@ -353,10 +353,16 @@ func handleExec(conn net.Conn) string {
 
 func handleType(key string) string {
 	_, ok := handleGet(time.Now(), key)
-	if !ok {
-		return "none"
+	if ok {
+		return "string"
 	}
-	return "string"
+
+	_, ok = _metaInfo.stream[key]
+	if ok {
+		return "stream"
+	}
+
+	return "none"
 }
 
 func handleXAdd(key string, id string, vals []string) string {
