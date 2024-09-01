@@ -294,7 +294,7 @@ func handleIncr(key string) (int64, bool) {
 }
 
 func handleExec(conn net.Conn) string {
-	//var respArr []string
+	var respArr []string
 
 	pendingTxns := _metaInfo.pendingTxn[conn.RemoteAddr().String()]
 	for _, pendingTxn := range pendingTxns {
@@ -307,16 +307,31 @@ func handleExec(conn net.Conn) string {
 
 		switch command {
 		case "get":
-			fmt.Printf("handle %s\n", command)
+			resp, ok := handleGet(time.Now(), strs[1])
+			if ok {
+				respArr = append(respArr, fmt.Sprintf("$%d\r\n%s\r\n", len(resp), resp))
+			} else {
+				reply := "-1"
+				respArr = append(respArr, fmt.Sprintf("$%s\r\n", reply))
+			}
 		case "set":
-			fmt.Printf("handle %s\n", command)
+			handleSet(time.Now(), strs[1:])
+			respArr = append(respArr, "+OK\r\n")
 		case "incr":
-			fmt.Printf("handle %s\n", command)
+			res, ok := handleIncr(strs[1])
+			if !ok {
+				respArr = append(respArr, "-ERR value is not an integer or out of range\r\n")
+			} else {
+				response := fmt.Sprintf(":%d\r\n", res)
+				respArr = append(respArr, response)
+			}
 		default:
 			fmt.Printf("unhandled %s\n", command)
 		}
 
 	}
 
-	return "*0\r\n"
+	ans := fmt.Sprintf("*%d\r\n", len(respArr))
+
+	return ans + strings.Join(respArr, "")
 }
