@@ -157,6 +157,9 @@ func handleCommand(conn net.Conn, rawStr string) {
 	case "type":
 		res := handleType(strs[1])
 		conn.Write([]byte(fmt.Sprintf("+%s\r\n", res)))
+	case "xadd":
+		res := handleXAdd(strs[1], strs[2], strs[3:])
+		conn.Write([]byte(fmt.Sprintf("+%s\r\n", res)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
@@ -354,4 +357,18 @@ func handleType(key string) string {
 		return "none"
 	}
 	return "string"
+}
+
+func handleXAdd(key string, id string, vals []string) string {
+	_val := make(map[string]string)
+	for i := 0; i < len(vals); i += 2 {
+		_val[vals[i]] = _val[vals[i+1]]
+	}
+
+	_metaInfo.stream[key] = append(_metaInfo.stream[key], stream{
+		id:    id,
+		value: _val,
+	})
+
+	return id
 }

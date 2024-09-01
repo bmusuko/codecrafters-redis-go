@@ -36,6 +36,9 @@ type metaInfo struct {
 	// multi
 	isMulti    map[string]bool
 	pendingTxn map[string][]string
+
+	// stream
+	stream map[string][]stream
 }
 
 func (mi *metaInfo) isMaster() bool {
@@ -80,6 +83,7 @@ func initMeta() {
 
 	_metaInfo.isMulti = make(map[string]bool)
 	_metaInfo.pendingTxn = make(map[string][]string)
+	_metaInfo.stream = make(map[string][]stream)
 }
 
 func getEmptyRDBByte() []byte {
