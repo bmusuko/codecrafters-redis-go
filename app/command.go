@@ -475,6 +475,9 @@ func handleXRead(args []string) string {
 		}
 		resps = append(resps, ans)
 	}
+	if len(resps) == 0 {
+		return "$-1\r\n"
+	}
 	ans := fmt.Sprintf("*%d\r\n", len(resps))
 	for _, resp := range resps {
 		ans += resp
