@@ -172,16 +172,14 @@ func handleCommand(conn net.Conn, rawStr string) {
 		resp := handleXRange(strs[1], strs[2], strs[3])
 		conn.Write([]byte(fmt.Sprintf("%s", resp)))
 	case "xread":
-		var commands []string
 		if strs[1] == "block" {
-			commands = strs[4:]
 			slp, err := strconv.Atoi(strs[2])
 			if err != nil {
 				return
 			}
 			if slp != 0 {
 				time.Sleep(time.Duration(slp) * time.Millisecond)
-				resp := handleXRead(strs[2:])
+				resp := handleXRead(strs[4:])
 				conn.Write([]byte(fmt.Sprintf("%s", resp)))
 			} else {
 				for {
