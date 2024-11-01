@@ -168,6 +168,9 @@ func handleCommand(conn net.Conn, rawStr string) {
 			return
 		}
 		conn.Write([]byte(fmt.Sprintf("+%s\r\n", res)))
+	case "xrange":
+		resp := handleXRange(strs[1], strs[2], strs[3])
+		conn.Write([]byte(fmt.Sprintf("%s", resp)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
@@ -417,15 +420,80 @@ func handleXAdd(key string, id string, vals []string) (bool, string) {
 
 	id = fmt.Sprintf("%d-%d", timestamp, sequence)
 
-	_val := make(map[string]string)
-	for i := 0; i < len(vals); i += 2 {
-		_val[vals[i]] = _val[vals[i+1]]
-	}
-
 	_metaInfo.stream[key] = append(_metaInfo.stream[key], stream{
 		id:    id,
-		value: _val,
+		value: vals,
 	})
 
 	return true, id
+}
+
+func handleXRange(key, from, to string) string {
+	arr := make([]stream, 0)
+
+	all := _metaInfo.stream[key]
+	for _, item := range all {
+		if isInRange(item.id, from, to) {
+			arr = append(arr, item)
+		}
+	}
+
+	ans := fmt.Sprintf("*%d\r\n", len(arr))
+	for _, item := range arr {
+		ans += "*2\r\n"
+		ans += fmt.Sprintf("%d\r\n%s\r\n", len(item.id), item.id)
+		ans += fmt.Sprintf("*%d\r\n", len(item.value))
+
+		for _, val := range item.value {
+			ans += fmt.Sprintf("%d\r\n%s\r\n", len(val), val)
+		}
+
+	}
+
+	return ans
+}
+
+func isInRange(id, from, to string) bool {
+	timestamp, sequence := parseID(id)
+	fromTimestamp, fromSequence := parseID(from)
+	toTimestamp, toSequence := parseID(to)
+
+	// from
+	if (fromTimestamp > timestamp) || (fromTimestamp == timestamp && fromSequence > sequence) {
+		return false
+	}
+
+	// to
+	if (toTimestamp < timestamp) || (toTimestamp == timestamp && toSequence < sequence) {
+		return false
+	}
+
+}
+
+func parseID(id string) (timestamp int64, sequence int) {
+	var err error
+
+	if !strings.Contains(id, "-") {
+		timestamp, err = strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			return 0, 0
+		}
+		return timestamp, 0
+	}
+
+	parts := strings.Split(id, "-")
+	if len(parts) != 2 {
+		return 0, 0
+	}
+
+	timestamp, err = strconv.ParseInt(parts[0], 10, 64)
+	if err != nil {
+		return 0, 0
+	}
+
+	sequence, err = strconv.Atoi(parts[1])
+	if err != nil {
+		return 0, 0
+	}
+	return timestamp, sequence
 }
