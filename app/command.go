@@ -460,6 +460,7 @@ func handleXRead(args []string) string {
 			}
 		}
 	}
+	fmt.Printf("ans: %s\n", strconv.Quote(ans))
 
 	return ans
 }
