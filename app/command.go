@@ -474,6 +474,7 @@ func handleXRead(args []string) string {
 		idx := i - 1
 		key := args[idx]
 		from := args[idx+(len(args)/2)]
+		fmt.Printf("key: %s, from: %s\n", key, from)
 
 		arg := xRead{
 			key: key,
