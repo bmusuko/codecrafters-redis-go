@@ -187,7 +187,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 						conn.Write([]byte(fmt.Sprintf("%s", resp)))
 						break
 					}
-					time.Sleep(100 * time.Millisecond)
+					time.Sleep(1000 * time.Millisecond)
 				}
 			}
 
@@ -491,7 +491,7 @@ func handleXRead(args []string) string {
 
 		}
 		data = append(data, arg)
-		fmt.Printf("parse: %+v", arg)
+		fmt.Printf("parse: %+v\n", arg)
 	}
 
 	time.Sleep(blockTime)
