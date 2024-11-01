@@ -375,9 +375,9 @@ func handleXAdd(key string, id string, vals []string) (bool, string) {
 		return false, "ERR The ID specified in XADD must be greater than 0-0"
 	}
 
-	parts := strings.Split(key, ",")
+	parts := strings.Split(key, "-")
 	if len(parts) != 2 {
-		return false, ""
+		return false, "invalid length"
 	}
 	timestamp, err := strconv.ParseInt(parts[0], 10, 64)
 	if err != nil {
