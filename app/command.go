@@ -163,6 +163,10 @@ func handleCommand(conn net.Conn, rawStr string) {
 			conn.Write([]byte(fmt.Sprintf("%s\r\n", res)))
 			return
 		}
+		if strs[2] == "*" {
+			conn.Write([]byte(fmt.Sprintf("$%d\r\n%s\r\n", len(res), res)))
+			return
+		}
 		conn.Write([]byte(fmt.Sprintf("+%s\r\n", res)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
