@@ -403,6 +403,8 @@ func handleXAdd(key string, id string, vals []string) (bool, string) {
 	_metaInfo.lastStreamMS = timestamp
 	_metaInfo.lastStreamSequence = sequence
 
+	id = fmt.Sprintf("%d-%d", timestamp, sequence)
+
 	_val := make(map[string]string)
 	for i := 0; i < len(vals); i += 2 {
 		_val[vals[i]] = _val[vals[i+1]]
