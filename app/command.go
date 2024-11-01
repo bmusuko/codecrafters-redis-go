@@ -372,7 +372,7 @@ func handleType(key string) string {
 func handleXAdd(key string, id string, vals []string) (bool, string) {
 	// validate key
 	if id == "0-0" {
-		return false, "+ERR The ID specified in XADD must be greater than 0-0"
+		return false, "-ERR The ID specified in XADD must be greater than 0-0"
 	}
 
 	parts := strings.Split(id, "-")
@@ -388,7 +388,7 @@ func handleXAdd(key string, id string, vals []string) (bool, string) {
 		return false, err.Error()
 	}
 	if (timestamp < _metaInfo.lastStreamMS) || (timestamp == _metaInfo.lastStreamMS && sequence <= _metaInfo.lastStreamSequence) {
-		return false, "+ERR The ID specified in XADD is equal or smaller than the target stream top item"
+		return false, "-ERR The ID specified in XADD is equal or smaller than the target stream top item"
 	}
 	_metaInfo.lastStreamMS = timestamp
 	_metaInfo.lastStreamSequence = sequence
