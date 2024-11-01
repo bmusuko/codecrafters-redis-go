@@ -172,7 +172,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 		resp := handleXRange(strs[1], strs[2], strs[3])
 		conn.Write([]byte(fmt.Sprintf("%s", resp)))
 	case "xread":
-		resp := handleXRead(strs[2], strs[3])
+		resp := handleXRead(strs[2:])
 		conn.Write([]byte(fmt.Sprintf("%s", resp)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
@@ -431,25 +431,34 @@ func handleXAdd(key string, id string, vals []string) (bool, string) {
 	return true, id
 }
 
-func handleXRead(key, from string) string {
-	timestamp, sequence := parseID(from)
-	newFrom := fmt.Sprintf("%d-%d", timestamp, sequence+1)
-	arr := getStreamData(key, newFrom, "+")
+func handleXRead(args []string) string {
+	num := len(args) / 2
 
-	ans := fmt.Sprintf("*1\r\n")
-	ans += fmt.Sprintf("*2\r\n")
-	ans += fmt.Sprintf("$%d\r\n%s\r\n", len(key), key)
-	ans += fmt.Sprintf("*%d\r\n", len(arr))
-	for _, item := range arr {
-		ans += "*2\r\n"
-		ans += fmt.Sprintf("$%d\r\n%s\r\n", len(item.id), item.id)
-		ans += fmt.Sprintf("*%d\r\n", len(item.value))
+	ans := fmt.Sprintf("*%d\r\n", num)
+	for i := 1; i <= num; i++ {
+		idx := i - 1
+		key := args[idx]
+		from := args[idx+num]
 
-		for _, val := range item.value {
-			ans += fmt.Sprintf("$%d\r\n%s\r\n", len(val), val)
+		timestamp, sequence := parseID(from)
+		newFrom := fmt.Sprintf("%d-%d", timestamp, sequence+1)
+		arr := getStreamData(key, newFrom, "+")
+
+		ans += fmt.Sprintf("*1\r\n")
+		ans += fmt.Sprintf("*2\r\n")
+		ans += fmt.Sprintf("$%d\r\n%s\r\n", len(key), key)
+		ans += fmt.Sprintf("*%d\r\n", len(arr))
+		for _, item := range arr {
+			ans += "*2\r\n"
+			ans += fmt.Sprintf("$%d\r\n%s\r\n", len(item.id), item.id)
+			ans += fmt.Sprintf("*%d\r\n", len(item.value))
+
+			for _, val := range item.value {
+				ans += fmt.Sprintf("$%d\r\n%s\r\n", len(val), val)
+			}
 		}
-
 	}
+
 	return ans
 }
 
