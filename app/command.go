@@ -491,7 +491,7 @@ func handleXRead(args []string) string {
 
 		}
 		data = append(data, arg)
-
+		fmt.Printf("parse: %+v", arg)
 	}
 
 	time.Sleep(blockTime)
