@@ -440,6 +440,8 @@ func handleXRead(args []string) string {
 		key := args[idx]
 		from := args[idx+num]
 
+		fmt.Printf("key=%s,from=%s\n", key, from)
+
 		timestamp, sequence := parseID(from)
 		newFrom := fmt.Sprintf("%d-%d", timestamp, sequence+1)
 		arr := getStreamData(key, newFrom, "+")
