@@ -383,10 +383,20 @@ func handleXAdd(key string, id string, vals []string) (bool, string) {
 	if err != nil {
 		return false, err.Error()
 	}
-	sequence, err := strconv.Atoi(parts[1])
-	if err != nil {
-		return false, err.Error()
+	var sequence int
+	if parts[1] == "*" {
+		if timestamp == _metaInfo.lastStreamMS {
+			sequence = _metaInfo.lastStreamSequence + 1
+		} else {
+			sequence = 0
+		}
+	} else {
+		sequence, err = strconv.Atoi(parts[1])
+		if err != nil {
+			return false, err.Error()
+		}
 	}
+
 	if (timestamp < _metaInfo.lastStreamMS) || (timestamp == _metaInfo.lastStreamMS && sequence <= _metaInfo.lastStreamSequence) {
 		return false, "-ERR The ID specified in XADD is equal or smaller than the target stream top item"
 	}
