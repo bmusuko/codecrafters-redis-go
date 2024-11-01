@@ -468,6 +468,7 @@ func isInRange(id, from, to string) bool {
 		return false
 	}
 
+	return true
 }
 
 func parseID(id string) (timestamp int64, sequence int) {
