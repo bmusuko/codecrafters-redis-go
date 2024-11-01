@@ -441,11 +441,11 @@ func handleXRange(key, from, to string) string {
 	ans := fmt.Sprintf("*%d\r\n", len(arr))
 	for _, item := range arr {
 		ans += "*2\r\n"
-		ans += fmt.Sprintf("%d\r\n%s\r\n", len(item.id), item.id)
+		ans += fmt.Sprintf("$%d\r\n%s\r\n", len(item.id), item.id)
 		ans += fmt.Sprintf("*%d\r\n", len(item.value))
 
 		for _, val := range item.value {
-			ans += fmt.Sprintf("%d\r\n%s\r\n", len(val), val)
+			ans += fmt.Sprintf("$%d\r\n%s\r\n", len(val), val)
 		}
 
 	}
