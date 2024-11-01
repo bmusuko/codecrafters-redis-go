@@ -177,7 +177,6 @@ func handleCommand(conn net.Conn, rawStr string) {
 			if err != nil {
 				return
 			}
-			time.Sleep(time.Duration(slp) * time.Millisecond)
 			if slp != 0 {
 				resp := handleXRead(strs[2:])
 				conn.Write([]byte(fmt.Sprintf("%s", resp)))
