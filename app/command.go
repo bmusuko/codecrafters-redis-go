@@ -158,7 +158,11 @@ func handleCommand(conn net.Conn, rawStr string) {
 		res := handleType(strs[1])
 		conn.Write([]byte(fmt.Sprintf("+%s\r\n", res)))
 	case "xadd":
-		res := handleXAdd(strs[1], strs[2], strs[3:])
+		val, res := handleXAdd(strs[1], strs[2], strs[3:])
+		if !val {
+			conn.Write([]byte(fmt.Sprintf("%s\r\n", res)))
+			return
+		}
 		conn.Write([]byte(fmt.Sprintf("+%s\r\n", res)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
@@ -365,7 +369,30 @@ func handleType(key string) string {
 	return "none"
 }
 
-func handleXAdd(key string, id string, vals []string) string {
+func handleXAdd(key string, id string, vals []string) (bool, string) {
+	// validate key
+	if key == "0-0" {
+		return false, "ERR The ID specified in XADD must be greater than 0-0"
+	}
+
+	parts := strings.Split(key)
+	if len(parts) != 2 {
+		return false, ""
+	}
+	timestamp, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return false, err.Error()
+	}
+	sequence, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return false, err.Error()
+	}
+	if (timestamp < _metaInfo.lastStreamMS) || (timestamp == _metaInfo.lastStreamMS && sequence < _metaInfo.lastStreamSequence) {
+		return false, "ERR The ID specified in XADD is equal or smaller than the target stream top item"
+	}
+	_metaInfo.lastStreamMS = timestamp
+	_metaInfo.lastStreamSequence = sequence
+
 	_val := make(map[string]string)
 	for i := 0; i < len(vals); i += 2 {
 		_val[vals[i]] = _val[vals[i+1]]
@@ -376,5 +403,5 @@ func handleXAdd(key string, id string, vals []string) string {
 		value: _val,
 	})
 
-	return id
+	return true, id
 }

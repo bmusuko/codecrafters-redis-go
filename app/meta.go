@@ -39,6 +39,8 @@ type metaInfo struct {
 
 	// stream
 	stream map[string][]stream
+	lastStreamMS int64
+	lastStreamSequence int
 }
 
 func (mi *metaInfo) isMaster() bool {
