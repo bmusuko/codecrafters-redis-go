@@ -446,17 +446,20 @@ func handleXAdd(key string, id string, vals []string) (bool, string) {
 func handleXRead(args []string) string {
 	num := len(args) / 2
 
-	ans := fmt.Sprintf("*%d\r\n", num)
+	var resps []string
 	for i := 1; i <= num; i++ {
 		idx := i - 1
 		key := args[idx]
 		from := args[idx+num]
 
-		fmt.Printf("key=%s,from=%s\n", key, from)
+		var ans string
 
 		timestamp, sequence := parseID(from)
 		newFrom := fmt.Sprintf("%d-%d", timestamp, sequence+1)
 		arr := getStreamData(key, newFrom, "+")
+		if len(arr) == 0 {
+			continue
+		}
 
 		ans += fmt.Sprintf("*2\r\n")
 		ans += fmt.Sprintf("$%d\r\n%s\r\n", len(key), key)
@@ -470,7 +473,13 @@ func handleXRead(args []string) string {
 				ans += fmt.Sprintf("$%d\r\n%s\r\n", len(val), val)
 			}
 		}
+		resps = append(resps, ans)
 	}
+	ans := fmt.Sprintf("*%d\r\n", len(resps))
+	for _, resp := range resps {
+		ans += resp
+	}
+
 	fmt.Printf("ans: %s\n", strconv.Quote(ans))
 
 	return ans
