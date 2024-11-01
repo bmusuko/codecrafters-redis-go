@@ -177,9 +177,9 @@ func handleCommand(conn net.Conn, rawStr string) {
 			if err != nil {
 				return
 			}
+			time.Sleep(time.Duration(slp) * time.Millisecond)
 			if slp != 0 {
-				time.Sleep(time.Duration(slp) * time.Millisecond)
-				resp := handleXRead(strs[4:])
+				resp := handleXRead(strs[2:])
 				conn.Write([]byte(fmt.Sprintf("%s", resp)))
 			} else {
 				for {
@@ -454,14 +454,53 @@ func handleXAdd(key string, id string, vals []string) (bool, string) {
 	return true, id
 }
 
-func handleXRead(args []string) string {
-	num := len(args) / 2
+type xRead struct {
+	key  string
+	from string
+}
 
-	var resps []string
-	for i := 1; i <= num; i++ {
+func handleXRead(args []string) string {
+	var data []xRead
+	var blockTime time.Duration
+
+	if args[0] == "block" {
+		slp, err := strconv.Atoi(args[1])
+		if err != nil {
+			return ""
+		}
+		blockTime = time.Duration(slp) * time.Millisecond
+		args = args[2:]
+	}
+	for i := 1; i <= len(args)/2; i++ {
 		idx := i - 1
 		key := args[idx]
-		from := args[idx+num]
+		from := args[idx+(len(args)/2)]
+
+		arg := xRead{
+			key: key,
+		}
+
+		if from != "$" {
+			arg.from = from
+		} else {
+			newFrom := "0-0"
+			arr := getStreamData(key, "-", "+")
+			if len(arr) > 0 {
+				newFrom = arr[len(arr)-1].id
+			}
+			arg.from = newFrom
+
+		}
+		data = append(data, arg)
+
+	}
+
+	time.Sleep(blockTime)
+
+	var resps []string
+	for _, d := range data {
+		key := d.key
+		from := d.from
 
 		var ans string
 
