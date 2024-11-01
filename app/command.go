@@ -179,13 +179,26 @@ func handleCommand(conn net.Conn, rawStr string) {
 			if err != nil {
 				return
 			}
-			time.Sleep(time.Duration(slp) * time.Millisecond)
+			if slp != 0 {
+				time.Sleep(time.Duration(slp) * time.Millisecond)
+				resp := handleXRead(strs[2:])
+				conn.Write([]byte(fmt.Sprintf("%s", resp)))
+			} else {
+				for {
+					resp := handleXRead(strs[2:])
+					if !strings.HasPrefix(resp, "$-1") {
+						conn.Write([]byte(fmt.Sprintf("%s", resp)))
+						break
+					}
+					time.Sleep(100 * time.Millisecond)
+				}
+			}
+
 		} else {
-			commands = strs[2:]
+			resp := handleXRead(strs[2:])
+			conn.Write([]byte(fmt.Sprintf("%s", resp)))
 		}
 
-		resp := handleXRead(commands)
-		conn.Write([]byte(fmt.Sprintf("%s", resp)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
