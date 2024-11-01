@@ -375,25 +375,33 @@ func handleXAdd(key string, id string, vals []string) (bool, string) {
 		return false, "-ERR The ID specified in XADD must be greater than 0-0"
 	}
 
-	parts := strings.Split(id, "-")
-	if len(parts) != 2 {
-		return false, "invalid length"
-	}
-	timestamp, err := strconv.ParseInt(parts[0], 10, 64)
-	if err != nil {
-		return false, err.Error()
-	}
 	var sequence int
-	if parts[1] == "*" {
-		if timestamp == _metaInfo.lastStreamMS {
-			sequence = _metaInfo.lastStreamSequence + 1
-		} else {
-			sequence = 0
-		}
+	var timestamp int64
+	var err error
+
+	if id == "*" {
+		timestamp = time.Now().UnixMilli()
+		sequence = 0
 	} else {
-		sequence, err = strconv.Atoi(parts[1])
+		parts := strings.Split(id, "-")
+		if len(parts) != 2 {
+			return false, "invalid length"
+		}
+		timestamp, err = strconv.ParseInt(parts[0], 10, 64)
 		if err != nil {
 			return false, err.Error()
+		}
+		if parts[1] == "*" {
+			if timestamp == _metaInfo.lastStreamMS {
+				sequence = _metaInfo.lastStreamSequence + 1
+			} else {
+				sequence = 0
+			}
+		} else {
+			sequence, err = strconv.Atoi(parts[1])
+			if err != nil {
+				return false, err.Error()
+			}
 		}
 	}
 
