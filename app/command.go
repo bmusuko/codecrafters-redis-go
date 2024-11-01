@@ -183,7 +183,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 				conn.Write([]byte(fmt.Sprintf("%s", resp)))
 			} else {
 				for {
-					resp := handleXRead(strs[2:])
+					resp := handleXRead(strs[4:])
 					if !strings.HasPrefix(resp, "$-1") {
 						conn.Write([]byte(fmt.Sprintf("%s", resp)))
 						break
