@@ -446,7 +446,6 @@ func handleXRead(args []string) string {
 		newFrom := fmt.Sprintf("%d-%d", timestamp, sequence+1)
 		arr := getStreamData(key, newFrom, "+")
 
-		ans += fmt.Sprintf("*1\r\n")
 		ans += fmt.Sprintf("*2\r\n")
 		ans += fmt.Sprintf("$%d\r\n%s\r\n", len(key), key)
 		ans += fmt.Sprintf("*%d\r\n", len(arr))
