@@ -459,12 +459,12 @@ func isInRange(id, from, to string) bool {
 	toTimestamp, toSequence := parseID(to)
 
 	// from
-	if (fromTimestamp > timestamp) || (fromTimestamp == timestamp && fromSequence > sequence) {
+	if (from != "-") && ((fromTimestamp > timestamp) || (fromTimestamp == timestamp && fromSequence > sequence)) {
 		return false
 	}
 
 	// to
-	if (toTimestamp < timestamp) || (toTimestamp == timestamp && toSequence < sequence) {
+	if (to != "+") && ((toTimestamp < timestamp) || (toTimestamp == timestamp && toSequence < sequence)) {
 		return false
 	}
 
