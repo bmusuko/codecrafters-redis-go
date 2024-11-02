@@ -172,25 +172,8 @@ func handleCommand(conn net.Conn, rawStr string) {
 		resp := handleXRange(strs[1], strs[2], strs[3])
 		conn.Write([]byte(fmt.Sprintf("%s", resp)))
 	case "xread":
-		if strs[1] == "block" {
-			slp, err := strconv.Atoi(strs[2])
-			if err != nil {
-				return
-			}
-			if slp != 0 {
-				resp := handleXRead(strs[2:])
-				conn.Write([]byte(fmt.Sprintf("%s", resp)))
-			} else {
-				time.Sleep(5000 * time.Millisecond)
-				resp := handleXRead(strs[4:])
-				conn.Write([]byte(fmt.Sprintf("%s", resp)))
-			}
-
-		} else {
-			resp := handleXRead(strs[2:])
-			conn.Write([]byte(fmt.Sprintf("%s", resp)))
-		}
-
+		resp := handleXRead(strs[2:])
+		conn.Write([]byte(fmt.Sprintf("%s", resp)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
@@ -454,8 +437,8 @@ type xRead struct {
 }
 
 func handleXRead(args []string) string {
-	var data []xRead
 	var blockTime time.Duration
+	var isBlock bool
 
 	if args[0] == "block" {
 		slp, err := strconv.Atoi(args[1])
@@ -464,33 +447,37 @@ func handleXRead(args []string) string {
 		}
 		blockTime = time.Duration(slp) * time.Millisecond
 		args = args[2:]
+		isBlock = true
 	}
-	for i := 1; i <= len(args)/2; i++ {
-		idx := i - 1
-		key := args[idx]
-		from := args[idx+(len(args)/2)]
-		fmt.Printf("key: %s, from: %s\n", key, from)
+	originalArgs := args[2:]
+	data := getXReadArg(originalArgs)
 
-		arg := xRead{
-			key: key,
-		}
-
-		if from != "$" {
-			arg.from = from
+	if isBlock {
+		if blockTime != 0 {
+			time.Sleep(blockTime)
 		} else {
-			newFrom := "0-0"
-			arr := getStreamData(key, "-", "+")
-			if len(arr) > 0 {
-				newFrom = arr[len(arr)-1].id
+			for {
+				var isExist bool
+
+				for _, d := range data {
+					timestamp, sequence := parseID(d.from)
+					newFrom := fmt.Sprintf("%d-%d", timestamp, sequence+1)
+
+					arr := getStreamData(d.key, newFrom, "+")
+					if len(arr) > 0 {
+						isExist = true
+						break
+					}
+				}
+
+				if isExist {
+					break
+				}
+				time.Sleep(100 * time.Millisecond)
 			}
-			arg.from = newFrom
-
 		}
-		data = append(data, arg)
-		fmt.Printf("parse: %+v\n", arg)
-	}
 
-	time.Sleep(blockTime)
+	}
 
 	var resps []string
 	for _, d := range data {
@@ -531,6 +518,36 @@ func handleXRead(args []string) string {
 	fmt.Printf("ans: %s\n", strconv.Quote(ans))
 
 	return ans
+}
+
+func getXReadArg(args []string) []xRead {
+	var data []xRead
+
+	for i := 1; i <= len(args)/2; i++ {
+		idx := i - 1
+		key := args[idx]
+		from := args[idx+(len(args)/2)]
+		fmt.Printf("key: %s, from: %s\n", key, from)
+
+		arg := xRead{
+			key: key,
+		}
+
+		if from != "$" {
+			arg.from = from
+		} else {
+			newFrom := "0-0"
+			arr := getStreamData(key, "-", "+")
+			if len(arr) > 0 {
+				newFrom = arr[len(arr)-1].id
+			}
+			arg.from = newFrom
+
+		}
+		data = append(data, arg)
+		fmt.Printf("parse: %+v\n", arg)
+	}
+	return data
 }
 
 func handleXRange(key, from, to string) string {
