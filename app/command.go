@@ -181,7 +181,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 				resp := handleXRead(strs[2:])
 				conn.Write([]byte(fmt.Sprintf("%s", resp)))
 			} else {
-				time.Sleep(9000 * time.Millisecond)
+				time.Sleep(5000 * time.Millisecond)
 				resp := handleXRead(strs[4:])
 				conn.Write([]byte(fmt.Sprintf("%s", resp)))
 			}
