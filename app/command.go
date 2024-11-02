@@ -451,8 +451,7 @@ func handleXRead(args []string) string {
 	} else {
 		args = args[1:]
 	}
-	originalArgs := args[2:]
-	data := getXReadArg(originalArgs)
+	data := getXReadArg(args)
 
 	if isBlock {
 		fmt.Printf("blocking")
@@ -460,7 +459,7 @@ func handleXRead(args []string) string {
 			fmt.Printf("non-zero blocking")
 			time.Sleep(blockTime)
 		} else {
-			fmt.Printf("zero blockign")
+			fmt.Printf("zero blocking")
 			for {
 				var isExist bool
 
