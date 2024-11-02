@@ -464,6 +464,7 @@ func handleXRead(args []string) string {
 					newFrom := fmt.Sprintf("%d-%d", timestamp, sequence+1)
 
 					arr := getStreamData(d.key, newFrom, "+")
+					fmt.Printf("get key=%s, from=%s, res=%d", d.key, d.from, len(arr))
 					if len(arr) > 0 {
 						isExist = true
 						break
