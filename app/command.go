@@ -172,7 +172,7 @@ func handleCommand(conn net.Conn, rawStr string) {
 		resp := handleXRange(strs[1], strs[2], strs[3])
 		conn.Write([]byte(fmt.Sprintf("%s", resp)))
 	case "xread":
-		resp := handleXRead(strs[2:])
+		resp := handleXRead(strs[1:])
 		conn.Write([]byte(fmt.Sprintf("%s", resp)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
@@ -446,8 +446,10 @@ func handleXRead(args []string) string {
 			return ""
 		}
 		blockTime = time.Duration(slp) * time.Millisecond
-		args = args[2:]
+		args = args[3:]
 		isBlock = true
+	} else {
+		args = args[1:]
 	}
 	originalArgs := args[2:]
 	data := getXReadArg(originalArgs)
