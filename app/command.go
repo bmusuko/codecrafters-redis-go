@@ -453,9 +453,12 @@ func handleXRead(args []string) string {
 	data := getXReadArg(originalArgs)
 
 	if isBlock {
+		fmt.Printf("blocking")
 		if blockTime != 0 {
+			fmt.Printf("non-zero blocking")
 			time.Sleep(blockTime)
 		} else {
+			fmt.Printf("zero blockign")
 			for {
 				var isExist bool
 
