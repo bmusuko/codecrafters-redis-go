@@ -16,10 +16,16 @@ type store struct {
 	expireAt   time.Time
 }
 
+type storeList struct {
+	values []string
+}
+
 var _map sync.Map
 var (
 	ackReceived = make(chan bool)
 )
+
+var _listMap sync.Map
 
 func handleCommand(conn net.Conn, rawStr string) {
 	rawBuf := []byte(rawStr)
@@ -174,6 +180,9 @@ func handleCommand(conn net.Conn, rawStr string) {
 	case "xread":
 		resp := handleXRead(strs[1:])
 		conn.Write([]byte(fmt.Sprintf("%s", resp)))
+	case "rpush":
+		resp := handleRPush(strs[1], strs[2])
+		conn.Write([]byte(fmt.Sprintf(":%d\r\n", resp)))
 	}
 	if !_metaInfo.isMaster() && shouldUpdateByte {
 		_metaInfo.processedBytes.Add(int32(byteLen))
@@ -570,6 +579,27 @@ func handleXRange(key, from, to string) string {
 	}
 
 	return ans
+}
+
+func handleRPush(key, val string) int {
+	res, ok := _listMap.Load(key)
+	if !ok {
+		item := storeList{
+			values: []string{val},
+		}
+
+		_listMap.Store(key, item)
+		return 1
+	}
+	item, ok := res.(storeList)
+	if !ok {
+		return -1
+	}
+	newItem := storeList{
+		values: append(item.values, val),
+	}
+	_listMap.Store(key, newItem)
+	return len(newItem.values)
 }
 
 func getStreamData(key, from, to string) []stream {
